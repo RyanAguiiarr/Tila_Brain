@@ -1,88 +1,100 @@
 ---
-title: "DICOM — Digital Imaging and Communications in Medicine"
+title: "O Padrão DICOM e Desafios de IA"
 type: concept
-tags: [medical, dicom, imaging, privacy, lgpd]
-sources: []
+tags: [dicom, radiology, medical-imaging, ai, pacs, lgpd]
+sources: [raw/codebase/snapshots/backend-structure.md]
 last_updated: 2026-05-07
 ---
 
-# DICOM — Digital Imaging and Communications in Medicine
+# O Padrão DICOM e Desafios de IA no TILA
 
-## O que é
+> Análise teórica e arquitetural do manuseio de imagens médicas no projeto TILA (Tecnologia Integradora de Laudos Automatizados).
 
-**DICOM** (Digital Imaging and Communications in Medicine) é o padrão internacional para comunicação e gerenciamento de imagens médicas e dados relacionados. Desenvolvido pelo NEMA (National Electrical Manufacturers Association) e o ACR (American College of Radiology), é o formato universal utilizado por praticamente todos os equipamentos de imagem médica: tomógrafos, aparelhos de ressonância magnética, ultrassom, radiografia digital, etc.
+---
 
-## Por que importa para o TILA
+## O que é DICOM?
 
-O TILA precisa processar imagens médicas para gerar pré-laudos. O DICOM é o formato padrão dessas imagens. Entender o DICOM é crucial para:
+DICOM (*Digital Imaging and Communications in Medicine*) não é apenas um formato de imagem (como JPG ou PNG). É um protocolo completo de comunicação e um formato de arquivo estruturado introduzido em 1993 pelo ACR (American College of Radiology).
 
-1. **Ingerir imagens** — receber e armazenar corretamente
-2. **Extrair metadata** — tipo de exame, modalidade, parâmetros de aquisição
-3. **Scrubbing de privacidade** — remover dados de paciente (LGPD)
-4. **Alimentar o pipeline de IA** — imagem limpa → CNN → achados
+Enquanto um JPEG tem apenas pixels e meia dúzia de metadados EXIF, um arquivo `.dcm` é um "banco de dados minúsculo" acoplado à imagem, contendo dezenas de **Tags DICOM** estruturadas que dizem tudo sobre o paciente, o aparelho de raio-x e a clínica.
 
-## Estrutura de um Arquivo DICOM
+### A Estrutura de um Arquivo DICOM
 
-Um arquivo DICOM contém:
-- **Header** — metadata organizado em tags padronizadas
-- **Pixel Data** — a imagem em si (pode ser comprimida)
+```json
+{
+  "Header": {
+    "PatientName (0010,0010)": "João da Silva",
+    "PatientID (0010,0020)": "CPF-123456789",
+    "PatientBirthDate (0010,0030)": "19800101",
+    "StudyDate (0008,0020)": "20260507",
+    "Modality (0008,0060)": "CR", // Computed Radiography
+    "BodyPartExamined (0018,0015)": "CHEST",
+    "Manufacturer (0008,0070)": "GE Healthcare"
+  },
+  "PixelData (7FE0,0010)": "[Matriz binária da imagem, muitas vezes 16-bit grayscale em vez dos 8-bit tradicionais do JPEG]"
+}
+```
 
-### Tags Mais Relevantes para TILA
+---
 
-| Tag | Nome | Conteúdo | Uso no TILA |
-|---|---|---|---|
-| (0008,0060) | Modality | CR, CT, MR, US, etc. | Identificar tipo de exame |
-| (0008,0070) | Manufacturer | Nome do fabricante | Contexto técnico |
-| (0008,1030) | Study Description | Descrição do estudo | Input para LLM |
-| (0010,0010) | Patient Name | Nome do paciente | ⚠️ REMOVER (LGPD) |
-| (0010,0020) | Patient ID | ID/CPF do paciente | ⚠️ REMOVER (LGPD) |
-| (0010,0030) | Birth Date | Data de nascimento | ⚠️ REMOVER (LGPD) |
-| (0010,0040) | Patient Sex | Sexo do paciente | MANTER (relevante clinicamente) |
-| (0018,0015) | Body Part Examined | Região anatômica | Input para CNN |
-| (0018,0060) | kVp | Tensão do tubo (raio-X) | Parâmetros técnicos |
-| (0028,0010) | Rows | Altura da imagem | Dimensões |
-| (0028,0011) | Columns | Largura da imagem | Dimensões |
-| (7FE0,0010) | Pixel Data | A imagem | Input para CNN |
+## O Gap Atual no Projeto TILA
 
-## Scrubbing de Metadata (Requisito LGPD)
+Hoje, a entidade `Exame` possui apenas um campo `String urlImagem`. 
+Isto sugere que o Frontend faria o upload de um JPEG/PNG ou de um DICOM inteiro direto para a API Spring Boot, e o backend salvaria na pasta local `/uploads/exames`.
 
-Antes de qualquer processamento, os dados pessoais do paciente devem ser removidos do arquivo DICOM. Isto é um requisito **legal** da LGPD (dados de saúde = dados sensíveis).
+**O Problema Arquitetural:**
+Se o TILA alimentar o LLM Gemini Multimodal (ou uma CNN especializada) apenas com um `.png` "achatado" (flat image), a IA perderá:
+1. **Windowing (Janelamento)**: DICOMs têm muito mais tons de cinza do que um monitor consegue exibir. Médicos manipulam o "W/L" (Window/Level) para focar apenas em osso ou apenas em pulmão usando o mesmo arquivo. O PNG destrói isso.
+2. **Escala Espacial**: A tag `PixelSpacing (0028,0030)` diz exatamente quantos milímetros tem um pixel na imagem. Sem isso, a IA não sabe se um nódulo tem 3mm (benigno) ou 3cm (câncer).
 
-### Dados a REMOVER Obrigatoriamente
-- `(0010,0010)` — Patient Name
-- `(0010,0020)` — Patient ID (pode ser CPF)
-- `(0010,0030)` — Patient Birth Date
-- `(0010,1000)` — Other Patient IDs
-- `(0010,1001)` — Other Patient Names
-- `(0008,0050)` — Accession Number (pode ser rastreável)
-- `(0008,0080)` — Institution Name (se necessário para anonimização completa)
-- `(0008,0090)` — Referring Physician Name
-- `(0008,1050)` — Performing Physician Name
+### O Risco LGPD (Scrubbing)
 
-### Dados a MANTER
-- Modalidade, parâmetros técnicos, região anatômica — relevantes para o laudo
-- Pixel data — a imagem em si (sem dados pessoais se scrubbing feito corretamente)
+Se o TILA mandar o arquivo DICOM cru para a API do Google Gemini (GCP), ele estará cometendo um **vazamento de dados massivo (Breach)**. As tags `(0010,0010)` e `(0010,0020)` contêm o nome e CPF do paciente. Mandar isso para um LLM em nuvem viola a LGPD e o sigilo médico.
 
-### Ferramentas de Scrubbing
-- **dcm4che** — biblioteca Java para manipulação DICOM (compatível com stack TILA)
-- **dcm4chee** — servidor PACS completo (inclui scrubbing)
-- **DICOM Anonymizer** — ferramentas standalone
+---
 
-## Gap Atual no TILA
+## Proposta de Arquitetura de Ingestão de Imagens (Futuro)
 
-> ⚠️ **O TILA atualmente NÃO possui servidor DICOM.** O frontend faz upload de imagens genéricas (JPG/PNG), não DICOM.
+Para que o pipeline de IA do TILA funcione com segurança jurídica e precisão clínica, o Backend precisará implementar um *DICOM Scrubber* antes de acionar a IA.
 
-### Planejamento
-- **Phase 3** do roadmap prevê integração com servidor DICOM
-- Decisão em aberto: usar dcm4chee (PACS completo) ou dcm4che (biblioteca) — ver [[context/roadmap]]
-- O pipeline de scrubbing deve ser implementado ANTES do pipeline de IA
+```mermaid
+sequenceDiagram
+    participant M as Médico (Frontend)
+    participant API as Spring Boot API
+    participant D4J as Dcm4che (Java Lib)
+    participant ST as AWS S3 / Local Storage
+    participant AI as Gemini 2.5 Flash
 
-## Referências
-- [[wiki/concepts/laudo-medico]] — O laudo que o DICOM alimenta
-- [[context/ai-pipeline]] — Pipeline completo de processamento
-- [[context/security-lgpd]] — Requisitos LGPD para dados médicos
-- [[context/roadmap]] — Planejamento de implementação DICOM
+    M->>API: Upload File (chest-xray.dcm)
+    API->>D4J: Parse DICOM File
+    
+    rect rgb(255, 235, 238)
+        note right of D4J: Estágio Crítico LGPD (Scrubbing)
+        D4J->>D4J: Remove (0010,0010) PatientName
+        D4J->>D4J: Remove (0010,0020) PatientID
+        D4J->>D4J: Extrai metadados clínicos limpos
+    end
+    
+    D4J->>API: DICOM Anonimizado + Metadados
+    API->>ST: Salva DICOM Anonimizado
+    
+    API->>AI: Envia DICOM Anonimizado + Prompt Textual
+    AI-->>API: Retorna Achados (JSON)
+    API-->>M: Preenche Rascunho do Laudo
+```
+
+### Biblioteca Recomendada
+A equipe do TILA deverá adicionar a dependência **`dcm4che`** (A mais poderosa biblioteca Java para manipulação de objetos DICOM e redes PACS) no `pom.xml`.
+
+```xml
+<dependency>
+    <groupId>org.dcm4che</groupId>
+    <artifactId>dcm4che-core</artifactId>
+    <version>5.29.0</version>
+</dependency>
+```
 
 ## Backlinks
-- [[wiki/overview]]
+- [[wiki/entities/entity-exame]]
 - [[context/ai-pipeline]]
+- [[context/security-lgpd]]

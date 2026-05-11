@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "1df866432ec20139",
+        "id": "14dc2607ac7f00cc",
         "type": "tabs",
         "children": [
           {
-            "id": "9fec398d3a15c85c",
+            "id": "84e741d07828287a",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "markdown",
+              "state": {
+                "file": "wiki/entities/spring-boot-backend.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "spring-boot-backend"
             }
           }
         ]
@@ -90,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "context/coding-conventions.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -99,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Links inversos"
+              "title": "Links inversos para coding-conventions"
             }
           },
           {
@@ -108,11 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "context/coding-conventions.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Links de saída"
+              "title": "Links de saída para coding-conventions"
             }
           },
           {
@@ -150,12 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "context/coding-conventions.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Sumário"
+              "title": "Sumário de coding-conventions"
             }
           }
         ]
@@ -176,20 +183,31 @@
       "bases:Criar nova base": false
     }
   },
-  "active": "9fec398d3a15c85c",
+  "active": "84e741d07828287a",
   "lastOpenFiles": [
-    "wiki/outputs/skill-md-update-2026-05-07.md",
-    "wiki/concepts/backend-patterns.md",
-    "wiki/entities/angular-frontend.md",
+    "index.md",
+    "skills/_template.md",
+    "context/coding-conventions.md",
+    "context/security-lgpd.md",
+    "context/roadmap.md",
+    "skills/skill-lint.md",
+    "log.md",
+    "CLAUDE.md",
+    "wiki/entities/entity-laudo.md",
+    "wiki/concepts/backend-services.md",
+    "wiki/entities/spring-boot-backend.md",
+    "wiki/concepts/api-endpoints.md",
     "wiki/concepts/frontend-architecture.md",
     "wiki/decisions/ADR-003-security-architecture.md",
     "wiki/decisions/ADR-002-api-response-pattern.md",
-    "wiki/concepts/backend-services.md",
-    "wiki/concepts/data-model.md",
+    "wiki/decisions/ADR-001-jwt-cookie-transport.md",
+    "wiki/entities/angular-frontend.md",
     "wiki/entities/entity-consulta.md",
     "wiki/entities/entity-conhecimento-medico.md",
+    "wiki/outputs/skill-md-update-2026-05-07.md",
+    "wiki/concepts/backend-patterns.md",
+    "wiki/concepts/data-model.md",
     "wiki/entities/entity-log-auditoria.md",
-    "wiki/entities/entity-laudo.md",
     "wiki/entities/entity-exame.md",
     "wiki/entities/entity-paciente.md"
   ]

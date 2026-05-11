@@ -1,81 +1,116 @@
 ---
-title: "ADR-002: API Response Pattern — GenericResult"
+title: "ADR-002: Padrão de Resposta de API (GenericResult)"
 type: decision
-tags: [architecture, adr, api, response-pattern]
-sources: [raw/codebase/snapshots/backend-structure.md]
+tags: [adr, api, rest, pattern, generic-result]
+status: Accepted (com ressalvas)
 last_updated: 2026-05-07
 ---
 
-# ADR-002: API Response Pattern — GenericResult<T>
+# ADR-002: Padrão de Resposta de API (GenericResult)
 
 ## Status
-Partially Adopted
+Aceito e Implementado (porém com falha de consistência no tratamento de exceções).
 
-## Context
-APIs REST precisam de um formato de resposta consistente para que o frontend possa tratar sucesso e erro de forma unificada. O TILA adotou o padrão `GenericResult<T>` como wrapper universal.
+## Contexto
+O projeto TILA (Tecnologia Integradora de Laudos Automatizados) exige uma comunicação assíncrona robusta entre o Frontend Angular (que funciona 100% via requisições AJAX/HttpClient) e o Backend Spring Boot.
+Historicamente, APIs REST mal projetadas retornam diretamente os objetos de domínio (ex: `[{"id": 1, "nome": "João"}]`) ou status code puro sem corpo em caso de erro, obrigando o Frontend a "adivinhar" o que deu errado.
+A equipe precisava de um contrato unificado, um "envelope", para que o Frontend soubesse exatamente onde ler a mensagem de sucesso/erro e os dados de carga útil (payload).
 
-## Decision
-Usar `GenericResult<T>` com a seguinte estrutura:
+## Decisão
 
+Adotamos o padrão **Wrapper Envelope** através da classe genérica `GenericResult<T>`.
+Todas as respostas (2xx, 4xx, 5xx) deverão seguir estritamente o seguinte contrato JSON:
+
+```json
+{
+  "success": boolean,
+  "message": string,
+  "data": T | null
+}
+```
+
+A classe base foi estruturada para ser imutável e criada apenas através de factory methods estáticos, forçando o desenvolvedor a não adulterar a resposta no meio do request.
+
+**Código Central da Decisão (`GenericResult.java`):**
 ```java
+@Getter
 public class GenericResult<T> {
     private final boolean success;
     private final String message;
     private final T data;
 
-    public static <T> GenericResult<T> success(T data);
-    public static <T> GenericResult<T> success(T data, String message);
-    public static <T> GenericResult<T> error(String message);
+    protected GenericResult(boolean success, String message, T data) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+    }
+
+    public static <T> GenericResult<T> success(T data){
+        return new GenericResult<>(true, "Operação realizada com sucesso !", data);
+    }
+
+    public static <T> GenericResult<T> error(String message){
+        return new GenericResult<>(false, message, null);
+    }
 }
 ```
 
-### Frontend
-O frontend define `GenericResult<T>` como interface TypeScript:
-```typescript
-export interface GenericResult<T> {
-  success: boolean;
-  message: string;
-  data: T;
+## Consequências
+
+### Pontos Positivos
+* **Consistência no Frontend**: O Angular precisa apenas de uma única interface global:
+  ```typescript
+  export interface GenericResult<T> {
+    success: boolean;
+    message: string;
+    data: T;
+  }
+  ```
+* **Tratamento Reativo Elegante**: Todos os `ApiServices` do Angular interceptam via `RxJS tap()` se a requisição é `res.success` e disparam um erro customizado se não for, impedindo que os componentes de UI tenham que lidar com ifs complexos.
+
+  ```typescript
+  // Exemplo de como o Frontend se beneficiou do ADR
+  return this.http.post<GenericResult<User>>(`${this.baseUrl}/login`, req).pipe(
+      tap({
+          next: (res) => { if (!res.success) throw new Error(res.message); }
+      })
+  );
+  ```
+* **Padrão Fácil para a Equipe**: Qualquer novo programador Spring só precisa fazer `return ResponseEntity.ok(GenericResult.success(dto));`.
+
+### Pontos Negativos & Dívida Técnica Gerada (GAPS IDENTIFICADOS)
+
+Infelizmente, a decisão arquitetural foi **quebrada** no tratamento global de erros (ControllerAdvice).
+
+Ao invés de retornar o GenericResult configurado com `false` para erros de aplicação (como "Paciente não encontrado" - HTTP 404), o `GlobalExceptionHandler` introduziu um record privado chamado `ErrorDetalhe`, desrespeitando este próprio ADR.
+
+**O Desvio (Anti-pattern Atual):**
+```java
+// Em GlobalExceptionHandler.java
+private record ErrorDetalhe(String mensagem){} // 🔴 VIOLAÇÃO DO ADR!
+
+@ExceptionHandler(EntityNotFoundException.class)
+public ResponseEntity handle404(EntityNotFoundException ex){
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(new ErrorDetalhe(ex.getMessage())); // Retorna { "mensagem": "..." }
 }
 ```
 
-Todos os API services usam `Observable<GenericResult<T>>` e verificam `res.success` no `tap()`.
+**Consequência do Desvio:**
+O frontend tenta interceptar a propriedade `message`, mas o JSON contém `mensagem`. O RxJS tentará acessar `res.success`, que será `undefined` (falsy) – lançando um erro vago na UI em vez do erro formatado do backend.
 
-## Compliance Snapshot (2026-05-07)
+## Ação de Correção Recomendada
+Refatorar imediatamente o `GlobalExceptionHandler` para respeitar este ADR.
 
-### ✅ Endpoints Conformes
-| Endpoint | Response Type |
-|---|---|
-| POST /auth/registrar | `GenericResult<Boolean>` |
-| POST /auth/login | `GenericResult<UserDTO>` |
-| GET /auth/me | `GenericResult<UserProfileDTO>` |
-| POST /paciente | `GenericResult<PacienteResponseDTO>` |
-| GET /paciente | `GenericResult<List<PacienteResponseDTO>>` |
-| GET /paciente/{id} | `GenericResult<PacienteResponseDTO>` |
-| GET /logs | `GenericResult<List<LogAuditoria>>` |
-
-### ❌ NÃO Conformes
-| Cenário | Response Atual | Deveria Ser |
-|---|---|---|
-| EntityNotFoundException (404) | `ErrorDetalhe { mensagem }` | `GenericResult.error(message)` com status 404 |
-| ValidationException (400) | `ErrorDetalhe { mensagem }` | `GenericResult.error(message)` com status 400 |
-| Outras exceptions | Stack trace default do Spring | `GenericResult.error(message)` com status 500 |
-
-## Consequences
-
-### Positivas
-- Frontend tem um único padrão para processar qualquer resposta
-- `success: false` permite diferenciar erro de negócio de erro HTTP
-- Mensagem humanizada inclusa na resposta
-
-### Negativas
-- `GlobalExceptionHandler` **não usa** `GenericResult` — retorna record privado `ErrorDetalhe`
-- Frontend precisa tratar dois formatos: `GenericResult` (sucesso) e `ErrorDetalhe` (erro)
-- `GenericResult.success()` hardcoda "Operação realizada com sucesso !" — mensagem genérica
-
-## Ação Recomendada
-Reescrever `GlobalExceptionHandler` para retornar `GenericResult.error()` em todas as exceptions, eliminando o `ErrorDetalhe`.
+```java
+// O Código deveria ser assim:
+@ExceptionHandler(EntityNotFoundException.class)
+public ResponseEntity<GenericResult<Void>> handle404(EntityNotFoundException ex){
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(GenericResult.error(ex.getMessage())); // Retorna { "success": false, "message": "...", "data": null }
+}
+```
 
 ## Backlinks
-- [[wiki/concepts/api-endpoints]]
-- [[wiki/concepts/backend-services]]
+- [[wiki/concepts/backend-patterns]]
+- [[context/coding-conventions]]

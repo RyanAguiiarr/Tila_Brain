@@ -1,110 +1,97 @@
 ---
-title: "Laudo Patterns — Padrões Estruturais de Laudos"
+title: "Padrões de Laudos Médicos"
 type: concept
-tags: [medical, laudo, patterns, nlp]
-sources: []
+tags: [radiology, laudos, medicina, nlp, ai-prompting]
+sources: [raw/codebase/snapshots/backend-structure.md]
 last_updated: 2026-05-07
 ---
 
-# Laudo Patterns — Padrões Estruturais de Laudos
+# Padrões de Laudos Médicos no TILA
 
-## Propósito
-
-Esta página cataloga os **padrões estruturais** de laudos médicos brasileiros — não o conteúdo clínico, mas a forma, a linguagem e a organização. Esses padrões alimentam o [[skills/skill-generate-laudo]] para que os pré-laudos do TILA sigam a estrutura esperada pelos médicos.
-
-> ⚠️ Esta página cresce conforme laudos anonimizados são ingeridos. Os padrões abaixo são genéricos e baseados em conhecimento público sobre laudos radiológicos brasileiros.
+> Este documento estabelece o guia conceitual e técnico de como a Inteligência Artificial do TILA deve formatar, redigir e estruturar os textos médicos.
+> Serve como base para o desenvolvimento do `System Prompt` do LangChain4j.
 
 ---
 
-## Seções Obrigatórias
+## O Desafio do Laudo Radiológico
 
-Todo laudo médico brasileiro, independente da especialidade, contém estas seções:
-
-| Seção | Presente em | Obrigatório |
-|---|---|---|
-| Exame (identificação do procedimento) | 100% | ✅ |
-| Técnica (protocolo de aquisição) | ~95% | ✅ (radiologia) |
-| Achados (descrição dos findings) | 100% | ✅ |
-| Impressão Diagnóstica (conclusão) | 100% | ✅ |
-| Observações | ~60% | Opcional |
-| Assinatura (CRM + nome) | 100% | ✅ (legal) |
+Um laudo médico não é um texto narrativo livre (como uma redação de colégio). É um **documento médico-legal**. Ele precisa ser:
+1. **Padronizado**: Outros médicos devem bater o olho e achar rapidamente o que buscam.
+2. **Conciso, porém Completo**: Evitar prosa desnecessária, mas não omitir achados incidentais.
+3. **Defensivo Legalmente**: Se uma imagem está borrada, o laudo deve atestar a "limitação técnica". A IA do TILA nunca deve tentar adivinhar o que não está nítido.
 
 ---
 
-## Registro de Linguagem
+## Estrutura Universal do Laudo TILA
 
-### Tom
-- **Formal e técnico** — nunca coloquial
-- **Terceira pessoa** — "Observa-se...", "Nota-se...", "Identifica-se..."
-- **Voz passiva preferida** — "Foi realizado exame de..." ao invés de "Realizei exame de..."
-- **Neutro** — sem juízos de valor, apenas descrição objetiva
+A IA deverá ser "forçada" a gerar o `rascunhoIA` (Entity `Laudo`) sempre em três ou quatro sessões fixas:
 
-### Terminologia
-- Usar termos anatômicos padrão (nomenclatura internacional)
-- Achados negativos são expressos como: "Sem evidências de...", "Ausência de..."
-- Achados positivos: "Presença de...", "Observa-se...", "Identifica-se..."
-- Medidas: sempre em centímetros (cm) ou milímetros (mm)
+### 1. Técnica (Obrigatório)
+Descreve como o exame foi feito. Importante para faturamento e para alertar limitações.
+* **Exemplo de IA**: "Radiografias do tórax adquiridas nas incidências posteroanterior e perfil, com inspiração adequada."
+* **Se a imagem for ruim**: "Estudo com artefatos de movimento que limitam parcialmente a análise."
 
-### Frases Padrão Recorrentes
-| Contexto | Frase Padrão |
+### 2. Relatório / Achados (Obrigatório)
+A descrição anatômica objetiva e detalhada, geralmente dividida por sistemas.
+* **Exemplo de IA**:
+  - Parênquima pulmonar sem consolidações ou massas.
+  - Seios costofrênicos livres.
+  - Área cardíaca de dimensões normais.
+  - Aorta torácica ectasiada e ateromatosa.
+
+### 3. Impressão / Conclusão (Obrigatório)
+O resumo sintético das alterações (ou a ausência delas). É a única parte que a maioria dos médicos solicitantes lê.
+* **Exemplo de IA**: "Sem alterações cardiopulmonares agudas evidenciáveis ao método." ou "Achados compatíveis com pneumonia basal direita."
+
+---
+
+## Glossário Anti-Alucinação (Guardrails)
+
+Para evitar que o Gemini (LLM) invente diagnósticos, o System Prompt deve proibir termos absolutos. Na radiologia, a imagem sugere, mas a clínica confirma.
+
+| Expressões Proibidas para a IA | Expressões Corretas (Permitidas) |
 |---|---|
-| Exame normal | "Exame dentro dos limites da normalidade." |
-| Limitação técnica | "Exame parcialmente prejudicado por [razão]." |
-| Comparação | "Em comparação com exame de [data], observa-se [mudança]." |
-| Sugestão de follow-up | "Sugere-se correlação clínica e controle evolutivo em [prazo]." |
-| Achado incidental | "Achado incidental: [descrição]. Sugere-se investigação complementar." |
+| "O paciente está com câncer" | "Nódulo espiculado altamente suspeito para neoplasia primária (BI-RADS 5)" |
+| "Com certeza é pneumonia" | "Opacidade alveolar basal compatível com processo infeccioso/inflamatório" |
+| "Coração inchado" | "Cardiomegalia" / "Aumento do índice cardiotorácico" |
 
 ---
 
-## Padrões por Modalidade
+## Implementação no Código (O System Prompt)
 
-### Radiografia (CR/DX)
-- Técnica geralmente breve: "Radiografia de tórax em PA e perfil."
-- Achados organizados por região: mediastino, campos pulmonares, pleura, estruturas ósseas
-- Impressão: concisa, 1–3 linhas
+Quando o `TilaRadiologistaAgent` for implementado usando `@AiService`, a formatação de laudo deve ser explicitamente mapeada na anotação `@SystemMessage`.
 
-### Tomografia Computadorizada (CT)
-- Técnica mais detalhada: uso de contraste, fases, espessura de corte
-- Achados organizados por compartimento/órgão
-- Medidas de lesões sempre incluídas
-- Impressão pode ser mais extensa (4–6 linhas)
+```java
+// Exemplo arquitetural do Guardrail de Laudo
+@SystemMessage("""
+    Você é um Médico Radiologista Sênior no Brasil.
+    Sua missão é gerar um RASCUNHO de laudo baseado nos achados.
+    
+    REGRA 1 - ESTRUTURA:
+    O seu texto DEVE conter os cabeçalhos exatos:
+    "TÉCNICA:"
+    "ANÁLISE:"
+    "IMPRESSÃO:"
+    
+    REGRA 2 - TOM DE VOZ:
+    Use jargão médico padrão do CBR (Colégio Brasileiro de Radiologia).
+    Seja telegráfico e objetivo. Não use pronomes pessoais ("eu vejo", "nós achamos").
+    
+    REGRA 3 - ÉTICA:
+    Você NÃO fará diagnósticos definitivos. Use termos como "sugestivo de", "compatível com", "pode representar".
+    Sempre adicione no final da impressão: "A critério clínico, correlacionar com exames laboratoriais."
+""")
+```
 
-### Ressonância Magnética (MR)
-- Técnica: sequências utilizadas (T1, T2, FLAIR, DWI, etc.)
-- Achados com descrição de sinal em cada sequência
-- Comparação com estudos prévios é mais comum
-- Impressão inclui classificação quando aplicável
+## Few-Shot Prompting via RAG (A Solução TILA)
 
-### Ultrassonografia (US)
-- Técnica: transdutor utilizado, região examinada
-- Achados com medidas e ecogenicidade
-- Impressão: concisa
+Ao invés de tentar ensinar radiologia no prompt (o que gastaria muitos tokens e encareceria a chamada da API do Gemini), o TILA usa a entidade `ConhecimentoMedico`.
 
----
-
-## Restrições LGPD
-
-| O que NÃO pode aparecer no laudo armazenado para ML |
-|---|
-| Nome do paciente |
-| CPF / RG / documento |
-| Data de nascimento exata (pode usar idade) |
-| Endereço |
-| Telefone / email |
-| Nome da instituição (se permite identificação indireta) |
-
----
-
-## Gap Atual
-
-O TILA ainda não possui laudos anonimizados reais ingeridos. Os padrões acima são baseados em conhecimento público. Conforme laudos forem depositados em `raw/laudos/` e ingeridos via [[skills/skill-ingest]], esta página será expandida com padrões específicos observados.
-
-## Referências
-- [[wiki/concepts/laudo-medico]] — Definição e estrutura do laudo
-- [[wiki/concepts/dicom]] — Formato de imagem que gera o laudo
-- [[context/ai-pipeline]] — Pipeline de geração de pré-laudo
-- [[skills/skill-generate-laudo]] — Skill que usa estes padrões
+A IA primeiro busca na base de dados: *"Como um radiologista humano escreve um laudo normal de Tórax?"*
+A base RAG (PgVector) retorna um texto de exemplo da categoria `LAUDO_EXEMPLO`.
+O LLM copia aquele estilo perfeitamente para o caso do paciente atual.
 
 ## Backlinks
-- [[wiki/overview]]
-- [[wiki/concepts/laudo-medico]]
+- [[wiki/concepts/ai-pipeline]]
+- [[wiki/entities/entity-laudo]]
+- [[wiki/concepts/dicom]]

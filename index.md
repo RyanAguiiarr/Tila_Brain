@@ -17,19 +17,19 @@
 | [[wiki/concepts/laudo-patterns]] | Padrões estruturais de laudos: seções, linguagem, modalidades | medical, patterns | 2026-05-07 |
 
 ## Entities
-| Page | Summary | Tags | Updated |
-|---|---|---|---|
-| [[wiki/entities/spring-boot-backend]] | Stack backend verificado: Spring Boot 4.0.3, Java 21, LangChain4j | backend, spring | 2026-05-07 |
-| [[wiki/entities/angular-frontend]] | Stack frontend verificado: Angular 19.2.x, 14 componentes | frontend, angular | 2026-05-07 |
-| [[wiki/entities/entity-usuario]] | JPA entity: UUID, email, senha, UserDetails impl | jpa, entity, security | 2026-05-07 |
-| [[wiki/entities/entity-medico]] | JPA entity: nomeCompleto, crm, assinaturaDigital, 1:1 Usuario | jpa, entity | 2026-05-07 |
-| [[wiki/entities/entity-paciente]] | JPA entity: cpf, 4 campos LGPD, 1:N Exame | jpa, entity, lgpd | 2026-05-07 |
-| [[wiki/entities/entity-exame]] | JPA entity: tipoExame, status, N:1 Paciente/Medico | jpa, entity | 2026-05-07 |
-| [[wiki/entities/entity-laudo]] | JPA entity: rascunhoIA, confidenceScore, StatusLaudo, @PrePersist | jpa, entity, ai | 2026-05-07 |
-| [[wiki/entities/entity-log-auditoria]] | JPA entity: acao, dataHora, ipOrigem(null), 5 ações logadas | jpa, entity, audit | 2026-05-07 |
-| [[wiki/entities/entity-conhecimento-medico]] | JPA entity: RAG knowledge base, 7 categorias médicas | jpa, entity, ai | 2026-05-07 |
-| [[wiki/entities/entity-consulta]] | Placeholder vazio — sem campos, sem tabela | jpa, placeholder | 2026-05-07 |
-| [[wiki/entities/spring-boot-4]] | Spring Boot 4 framework reference page | framework, spring | 2026-05-07 |
+| Page                                         | Summary                                                           | Tags                  | Updated    |
+| -------------------------------------------- | ----------------------------------------------------------------- | --------------------- | ---------- |
+| [[wiki/entities/spring-boot-backend]]        | Stack backend verificado: Spring Boot 4.0.3, Java 21, LangChain4j | backend, spring       | 2026-05-07 |
+| [[wiki/entities/angular-frontend]]           | Stack frontend verificado: Angular 19.2.x, 14 componentes         | frontend, angular     | 2026-05-07 |
+| [[wiki/entities/entity-usuario]]             | JPA entity: UUID, email, senha, UserDetails impl                  | jpa, entity, security | 2026-05-07 |
+| [[wiki/entities/entity-medico]]              | JPA entity: nomeCompleto, crm, assinaturaDigital, 1:1 Usuario     | jpa, entity           | 2026-05-07 |
+| [[wiki/entities/entity-paciente]]            | JPA entity: cpf, 4 campos LGPD, 1:N Exame                         | jpa, entity, lgpd     | 2026-05-07 |
+| [[wiki/entities/entity-exame]]               | JPA entity: tipoExame, status, N:1 Paciente/Medico                | jpa, entity           | 2026-05-07 |
+| [[wiki/entities/entity-laudo]]               | JPA entity: rascunhoIA, confidenceScore, StatusLaudo, @PrePersist | jpa, entity, ai       | 2026-05-07 |
+| [[wiki/entities/entity-log-auditoria]]       | JPA entity: acao, dataHora, ipOrigem(null), 5 ações logadas       | jpa, entity, audit    | 2026-05-07 |
+| [[wiki/entities/entity-conhecimento-medico]] | JPA entity: RAG knowledge base, 7 categorias médicas              | jpa, entity, ai       | 2026-05-07 |
+| [[wiki/entities/entity-consulta]]            | Placeholder vazio — sem campos, sem tabela                        | jpa, placeholder      | 2026-05-07 |
+| [[wiki/entities/spring-boot-4]]              | Spring Boot 4 framework reference page                            | framework, spring     | 2026-05-07 |
 
 ## Decisions (ADRs)
 | Page | Summary | Tags | Updated |

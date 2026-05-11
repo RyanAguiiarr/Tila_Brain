@@ -1,132 +1,218 @@
 ---
 title: "Coding Conventions — TILA (Verificado)"
 type: context
-tags: [conventions, backend, frontend, patterns]
+tags: [conventions, backend, frontend, patterns, architecture]
 sources: [raw/codebase/snapshots/backend-structure.md]
 last_updated: 2026-05-07
 ---
 
-# Coding Conventions — TILA
+# Coding Conventions & Anti-Patterns — TILA
 
-> Baseado em auditoria do código real em 2026-05-07. Documenta o que o código **realmente faz**, não o que deveria fazer.
+> Análise profunda dos padrões de codificação adotados (intencionalmente ou acidentalmente) no projeto TILA, extraídos diretamente do código real em 2026-05-07.
 
----
-
-## Backend — Convenções Reais
-
-### Pacote Base
-`tecnologi.tila.tila` — ⚠️ nome não usual (tila repetido)
-
-### DTO Pattern
-- ✅ **Records** para todos os DTOs: DadosAutenticacao, DadosCadastroMedico, UserDTO, UserProfileDTO, PacienteRequestDTO, PacienteResponseDTO, ExameRequestDTO, ExameResponseDTO, ConsultaDTO
-- ✅ Bean Validation nos records: `@NotBlank`, `@NotNull`, `@Email`, `@CPF`, `@Past`
-- ⚠️ `PacienteResponseDTO` inclui `List<Exame>` (entity JPA) ao invés de DTO — violação do padrão
-- ⚠️ `DadosResponseLogin` existe mas é legado (não usado)
-
-### Response Pattern
-- ✅ `GenericResult<T>` usado em **todos** os controllers
-- ❌ `GlobalExceptionHandler` retorna `ErrorDetalhe` (record privado) ao invés de `GenericResult.error()`
-- **Compliance**: ~85% (todos os endpoints happy path usam GenericResult, mas error path não)
-
-### Injection Style
-- **Misto**:
-  - ✅ Constructor injection: PacienteService, logAuditoriaService, logAuditoriaController, AutenticacaoController, TokenService
-  - ❌ `@Autowired` field injection: SecurityConfigurations, SecurityFilter, AutenticacaoService, PacienteController
-
-### Exception Handling
-- ✅ `@RestControllerAdvice` (`GlobalExceptionHandler`)
-- Trata: EntityNotFoundException (404), ValidationException (400)
-- ❌ Não trata: RuntimeException, NullPointerException, AuthenticationException
-- ❌ Formato de resposta inconsistente (ErrorDetalhe vs GenericResult)
-
-### Transaction Management
-- ✅ `@Transactional` em `PacienteService.cadastrar()`
-- ✅ `@Transactional(readOnly=true)` em `PacienteService.buscarTodosPacientes()`
-- ❌ Sem `@Transactional` em `bucasPorId()` e `buscarPorCpf()`
-- ❌ Sem `@Transactional` no logAuditoriaService
-
-### Naming
-- ✅ PascalCase para entities (Usuario, Medico, Paciente, Exame, Laudo)
-- ✅ camelCase para fields
-- ❌ `logAuditoriaController` e `logAuditoriaService` — camelCase ao invés de PascalCase
-- ❌ `StatuExame` — typo (falta 's')
-- ❌ `athenticate` — typo no pacote (falta 'u')
-- ❌ `bucasPorId` e `bucasTodosPacientes` — typos no nome dos métodos
-
-### Lombok Usage
-- Todas as entities usam `@Getter @Setter @NoArgsConstructor @AllArgsConstructor`
-- ⚠️ Laudo e ConhecimentoMedico não usam `@NoArgsConstructor` do Lombok — construtores manuais
-- `GenericResult` usa `@Getter` apenas
+Este documento serve como um guia do "O que o time fez" versus "O que o time deveria ter feito". As 14 violações registradas na ingestão inicial estão detalhadas aqui.
 
 ---
 
-## Frontend — Convenções Reais
+## 1. Dependency Injection (DI)
 
-### Component Style
-- ✅ **100% Standalone** — nenhum NgModule
-- ✅ Todos usam `standalone: true` no decorator
-- ✅ Imports explícitos no decorator
+### Padrão Esperado: Constructor Injection
+No Spring moderno (Boot 4.x), a injeção via construtor é o padrão-ouro. Facilita testes unitários (não requer Mockito `InjectMocks`), garante imutabilidade (campos `final`) e detecta dependências circulares em tempo de startup. No Angular 19, a função `inject()` substituiu o construtor.
 
-### State Management
-- ✅ **AuthStore**: signal-based com `signal()`, `computed()`, `effect()`
-- ✅ **MedicalStore**: signal-based
-- ⚠️ **57% dos componentes** usam signals para estado local
-- ❌ LoginComponent, CadastroComponent, CadastroPacienteComponent usam plain properties
+### A Realidade Encontrada (Backend)
+O código tem uma "crise de identidade" entre `@Autowired` e Construtores.
 
-### HTTP Pattern
-- ✅ HttpClient com `provideHttpClient(withInterceptors([authInterceptor]))`
-- ✅ Todos os API services retornam `Observable<GenericResult<T>>`
-- ✅ Padrão `tap({ next: ... , error: ... })` em todos os services
-- ✅ `firstValueFrom()` usado para converter Observable → Promise em componentes async
-- ⚠️ `withCredentials: true` setado inconsistentemente: no interceptor E redundantemente em PacienteApiService
+```mermaid
+pie title Backend DI Pattern
+    "Constructor Injection (Recomendado)" : 40
+    "@Autowired Field Injection (Anti-pattern)" : 60
+```
 
-### CSS
-- ✅ **Vanilla CSS** — sem frameworks CSS
-- ✅ CSS custom properties (variáveis globais)
-- ✅ Arquivos CSS separados (não inline)
-- ✅ Inter (Google Fonts) como tipografia
+🔴 **Anti-pattern encontrado (`AutenticacaoController.java` e `PacienteController.java`)**:
+```java
+@RestController
+public class AutenticacaoController {
+    @Autowired private AuthenticationManager manager;
+    @Autowired private TokenService tokenService;
+    // ... 5 campos injetados via field
+}
+```
 
-### Routing
-- ❌ **0% lazy loading** — todos os componentes importados eagerly
-- ✅ authGuard em todas as rotas protegidas
-- ✅ Wildcard route `**` → redirect login
+✅ **Padrão Correto encontrado (`PacienteService.java`)**:
+```java
+@Service
+public class PacienteService {
+    private final PacienteRepository pacienteRepository;
+    
+    // Spring Boot resolve automaticamente (não precisa de @Autowired)
+    public PacienteService(PacienteRepository pacienteRepository) {
+        this.pacienteRepository = pacienteRepository;
+    }
+}
+```
 
-### DI Style
-- ✅ **100% `inject()` function** — nenhum construtor para DI
-- ⚠️ SidebarComponent mistura `inject()` com `@Input/@Output` (aceitável)
+### A Realidade Encontrada (Frontend)
+O frontend foi refatorado impecavelmente para os padrões do Angular 19.
 
-### Forms
-- ✅ Template-driven com FormsModule + `[(ngModel)]`
-- ❌ Sem ReactiveFormsModule em nenhum componente
-- Validação manual inline (sem Angular validators)
+✅ **Padrão 100% Consistente (`AuthStore`, `LoginComponent`, etc)**:
+```typescript
+@Injectable()
+export class AuthStore {
+    private authApi = inject(AuthApiService); // Clean, moderno
+}
+```
 
 ---
 
-## Divergências — Convenção Esperada vs Encontrada
+## 2. API Response Wrapper
 
-| Arquivo | Convenção | Esperado | Encontrado | Severidade |
-|---|---|---|---|---|
-| `PacienteController.java` | DI | Constructor injection | `@Autowired` field | 🟡 |
-| `SecurityConfigurations.java` | DI | Constructor injection | `@Autowired` field | 🟡 |
-| `SecurityFilter.java` | DI | Constructor injection | `@Autowired` field | 🟡 |
-| `AutenticacaoService.java` | DI | Constructor injection | `@Autowired` field | 🟡 |
-| `logAuditoriaController.java` | Naming | PascalCase | camelCase | 🟡 |
-| `logAuditoriaService.java` | Naming | PascalCase | camelCase | 🟡 |
-| `service/athenticate/` | Naming | `authenticate` | `athenticate` (typo) | 🟡 |
-| `PacienteResponseDTO.java` | DTO pattern | DTO only | `List<Exame>` entity | 🔴 |
-| `GlobalExceptionHandler.java` | Response pattern | `GenericResult.error()` | `ErrorDetalhe` | 🟡 |
-| `AutenticacaoController.java` | Optional handling | `orElseThrow()` | `.get()` | 🔴 |
-| `logAuditoriaService.java` | Empty result | Return empty list | throws RuntimeException | 🟡 |
-| `app.routes.ts` | Lazy loading | `loadComponent: () => import(...)` | Direct import | 🟡 |
-| LoginComponent | Signals | `signal()` para estado | plain properties | 🔵 |
-| CadastroComponent | Signals | `signal()` para estado | plain properties | 🔵 |
-| CadastroPacienteComponent | Signals | `signal()` para estado | plain properties | 🔵 |
+### Padrão Esperado: GenericResult\<T\> Uniforme
+Toda API deveria retornar `GenericResult<T>`, tanto em sucesso (2xx) quanto em erros (4xx, 5xx), garantindo que o frontend faça o *parse* da resposta de apenas uma forma.
 
-## Referências
-- [[wiki/concepts/backend-services]]
-- [[wiki/concepts/frontend-architecture]]
-- [[wiki/concepts/api-endpoints]]
+### A Realidade Encontrada
+O frontend Angular sofre porque o Backend quebra seu próprio contrato no ExceptionHandler.
+
+🔴 **Anti-pattern: O Exception Handler Rebelde**:
+```java
+// GlobalExceptionHandler.java
+private record ErrorDetalhe(String mensagem){}
+
+@ExceptionHandler(EntityNotFoundException.class)
+public ResponseEntity handle404(EntityNotFoundException ex){
+    // 🔴 Retorna { "mensagem": "..." }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(new ErrorDetalhe(ex.getMessage()));
+}
+```
+
+✅ **O Padrão Correto (usado nos Controllers de sucesso)**:
+```java
+// Retorna { "success": false, "message": "...", "data": null }
+return ResponseEntity.badRequest()
+    .body(GenericResult.error("CPF já cadastrado!"));
+```
+
+**Impacto**: O `PacienteApiService.ts` (Frontend) tipa o retorno como `GenericResult<T>`, mas se o backend der 404, o Angular recebe `{ mensagem: "..." }` e não `{ message: "..." }`.
+
+---
+
+## 3. Data Transfer Objects (DTOs)
+
+### Padrão Esperado: Java Records
+Java 14 introduziu `record`, perfeito para DTOs por ser imutável, requerer zero boilerplate, e suportar anotações de validação (`@Valid`).
+
+### A Realidade Encontrada
+O TILA adotou `records` perfeitamente em 100% dos DTOs do backend! 🎉
+
+✅ **Bom exemplo (`PacienteRequestDTO.java`)**:
+```java
+public record PacienteRequestDTO(
+    @NotBlank String nomeCompleto,
+    @NotBlank @CPF String cpf,
+    @NotNull LocalDate dataNascimento,
+    String telefone
+) {}
+```
+
+🔴 **Anti-pattern fatal: "Vazamento de Entidade"**:
+Embora o DTO seja um record, um deles incluiu uma Entidade do Hibernate dentro de si, anulando o propósito do DTO (que é isolar a camada de banco da camada HTTP).
+
+```java
+public record PacienteResponseDTO(
+    Long id,
+    String nomeCompleto,
+    List<Exame> exames // 🔴 ERROR: Exame é uma Entidade JPA!
+) {}
+```
+Isso causa o infame `LazyInitializationException` e potencial exposição recursiva de dados (Paciente tem Exames, Exame tem Paciente, serialização JSON infinita).
+
+---
+
+## 4. Tratamento de Optionals no Java
+
+### Padrão Esperado: `.orElseThrow()`
+Ao buscar algo no repositório, o Spring retorna um `Optional<T>`. Tentar usar os dados sem confirmar se eles existem é a receita do NullPointerException.
+
+### A Realidade Encontrada
+Há instâncias do `Optional.get()` chamadas de forma irresponsável, sem `isPresent()`.
+
+🔴 **O "Voo Cego" (`SecurityFilter.java`)**:
+```java
+// Se este usuário foi removido do banco 1 segundo atrás, isto gerará um NoSuchElementException
+// que derruba o request sem tratamento.
+var usuario = usuarioRepository.findByEmail(subject).get(); 
+```
+
+✅ **O Padrão Seguro (`PacienteService.java`)**:
+```java
+var paciente = pacienteRepository.findByCpf(cpf)
+    .orElseThrow(() -> new EntityNotFoundException("Paciente não encontrado"));
+```
+
+---
+
+## 5. Naming Conventions (Nomenclatura)
+
+### Padrão Esperado
+- Classes/Interfaces: `PascalCase`
+- Pacotes: `lowercase` (uma palavra, no máximo hífens se essencial)
+- Métodos/Variáveis: `camelCase`
+
+### A Realidade Encontrada (Gaps Mapeados)
+
+1. **Classes com camelCase** (Violação do Standard Java):
+   - 🔴 `logAuditoriaService.java` (deveria ser `LogAuditoriaService.java`)
+   - 🔴 `logAuditoriaController.java` (deveria ser `LogAuditoriaController.java`)
+
+2. **Typos (Erros de Digitação)**:
+   - 🔴 Pacote `athenticate` (deveria ser `authenticate`)
+   - 🔴 Método `bucasPorId` (deveria ser `buscarPorId`) no PacienteService
+   - 🔴 Enum `StatuExame` (deveria ser `StatusExame`)
+
+---
+
+## 6. Frontend: State Management (Angular)
+
+### Padrão Esperado: Signals (`signal()`, `computed()`)
+Angular 16+ introduziu Signals como o reativo primitivo padrão. Eles são síncronos, limpos e evitam memory leaks sem precisar de `.unsubscribe()` (diferente do RxJS `Subject`).
+
+### A Realidade Encontrada
+Uma mistura interessante de modernidade (`AuthStore`) e código legado (`LoginComponent`).
+
+✅ **Padrão Moderno (`PacientesComponent.ts`)**:
+```typescript
+pacientes = signal<Paciente[]>([]);
+searchTerm = signal('');
+
+// Automático e reativo!
+filteredPacientes = computed(() => {
+    return this.pacientes().filter(p => p.nome.includes(this.searchTerm()));
+});
+```
+
+🔴 **Padrão Antigo / Plain Properties (`LoginComponent.ts`)**:
+```typescript
+email = '';     // 🔴 Propriedade simples (não-reativa no Angular 19)
+senha = '';
+errorMessage = '';
+```
+
+---
+
+## Tabela Resumo de Padronização para Refatorações
+
+| Componente | Padrão Oficial TILA | Exceções Permitidas? |
+|---|---|---|
+| Injeção Backend | Constructor (final fields) | `SecurityConfig` se tiver circular ref |
+| Injeção Frontend | `inject()` inline | Nenhuma. Constructor `private` não permitido |
+| API Response | `GenericResult<T>` | Exceptions devem usar GenericResult.error() |
+| DTOs | Java Records + Bean Validation | Não permitir Entity dentro de DTO |
+| Optionals | `.orElseThrow()` | `.orElse(null)` aceito em loops defensivos |
+| Angular UI State | `signal()` | Template-driven forms com `[(ngModel)]` no signal |
+| CSS | Vanilla, sem Tailwind | O template original é limpo, manter Inter font |
+| Routing Angular | `loadComponent` (Lazy) | Nenhuma. Parar de usar imports eager |
 
 ## Backlinks
-- [[wiki/overview]]
-- [[context/roadmap]]
+- [[wiki/concepts/backend-patterns]]
+- [[wiki/concepts/angular-patterns]]
+- [[wiki/decisions/ADR-002-api-response-pattern]]
