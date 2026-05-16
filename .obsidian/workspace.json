@@ -11,14 +11,10 @@
             "id": "84e741d07828287a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "wiki/entities/spring-boot-backend.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "spring-boot-backend"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Visualização em gráfico"
             }
           }
         ]
@@ -185,6 +181,15 @@
   },
   "active": "84e741d07828287a",
   "lastOpenFiles": [
+    "Clippings/Substituí o Claude Design… e Não Tem Limites (Open Design).md",
+    "raw/codebase/changelog/2026-05-16-ai-agent-foundation.md",
+    "wiki/concepts/data-model.md",
+    "Clippings",
+    "wiki/entities/entity-consulta.md",
+    "wiki/concepts/backend-services.md",
+    "wiki/concepts/backend-patterns.md",
+    "wiki/entities/angular-frontend.md",
+    "wiki/entities/spring-boot-backend.md",
     "index.md",
     "skills/_template.md",
     "context/coding-conventions.md",
@@ -194,21 +199,14 @@
     "log.md",
     "CLAUDE.md",
     "wiki/entities/entity-laudo.md",
-    "wiki/concepts/backend-services.md",
-    "wiki/entities/spring-boot-backend.md",
     "wiki/concepts/api-endpoints.md",
     "wiki/concepts/frontend-architecture.md",
     "wiki/decisions/ADR-003-security-architecture.md",
     "wiki/decisions/ADR-002-api-response-pattern.md",
     "wiki/decisions/ADR-001-jwt-cookie-transport.md",
-    "wiki/entities/angular-frontend.md",
-    "wiki/entities/entity-consulta.md",
     "wiki/entities/entity-conhecimento-medico.md",
     "wiki/outputs/skill-md-update-2026-05-07.md",
-    "wiki/concepts/backend-patterns.md",
-    "wiki/concepts/data-model.md",
     "wiki/entities/entity-log-auditoria.md",
-    "wiki/entities/entity-exame.md",
-    "wiki/entities/entity-paciente.md"
+    "wiki/entities/entity-exame.md"
   ]
 }

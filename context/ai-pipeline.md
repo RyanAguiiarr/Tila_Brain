@@ -463,11 +463,11 @@ import dev.langchain4j.service.UserMessage;
 public interface TilaRadiologistaAgent {
 
     @SystemMessage("""
-        Você é um radiologista assistente especializado em laudos médicos brasileiros.
-        Você recebe achados de exames de imagem e gera pré-laudos estruturados.
+        Você é um radiologista assistente especializado em laudos médicos brasileiros, com **foco exclusivo em Raio-X de Tórax**.
+        Você recebe achados de radiografias torácicas e gera pré-laudos estruturados.
         
         REGRAS:
-        1. Use terminologia ACR/CBR padronizada
+        1. Use terminologia ACR/CBR padronizada para radiologia torácica
         2. Estruture: TÉCNICA → ACHADOS → IMPRESSÃO
         3. Sempre inclua grau de confiança (0-100)
         4. Nunca faça diagnóstico definitivo — apenas sugira

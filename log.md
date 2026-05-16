@@ -21,3 +21,13 @@ Key findings:
 - DB changed from TilaDB:5433 to vectorDB:5434
 - 3 secrets hardcoded (JWT, DB password, Gemini API key)
 - AI infrastructure 70% configured, 0% operational
+
+## [2026-05-16 11:11] capture | Feature: AI Agent Foundation — Raio-X de Tórax
+TilaRadiologistaAgent interface criada com @SystemMessage(fromResource) + @UserMessage parametrizado + Image multimodal.
+System prompt Dr. TILA escrito — foco exclusivo RX de Tórax (PA e Perfil).
+TilaRagConfig atualizado com bean tilaAgent() via AiServices.builder().
+Decisão de escopo: agente analisa EXCLUSIVAMENTE Raio-X de Tórax na Fase 2.
+Design completo documentado: ExameRepository (JOIN FETCH), 3 DTOs Laudo, LaudoService (4 métodos), LaudoController.
+3 bugs críticos identificados e registrados no roadmap (API key hardcoded, txt no lugar errado, @V inválido).
+Wiki atualizada: entity-laudo, api-endpoints, roadmap, project-identity, index.
+Changelog criado: raw/codebase/changelog/2026-05-16-ai-agent-foundation.md

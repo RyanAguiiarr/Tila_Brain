@@ -1,5 +1,5 @@
 # Tila_Brain Index
-> Last updated: 2026-05-07 | Pages: 24 | Sources: 1 raw snapshot
+> Last updated: 2026-05-16 | Pages: 25 | Sources: 2 raw snapshots
 
 ## Concepts
 | Page | Summary | Tags | Updated |
@@ -42,6 +42,7 @@
 | Page | Summary | Tags | Updated |
 |---|---|---|---|
 | [[raw/codebase/snapshots/backend-structure]] | Snapshot completo do backend: deps, packages, config, security gaps | raw, snapshot | 2026-05-07 |
+| [[raw/codebase/changelog/2026-05-16-ai-agent-foundation]] | Changelog: TilaRadiologistaAgent, system prompt RX Tórax, design LaudoService | raw, changelog, ai | 2026-05-16 |
 
 ## Outputs
 | Page | Summary | Tags | Updated |

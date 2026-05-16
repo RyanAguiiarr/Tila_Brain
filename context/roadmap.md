@@ -3,7 +3,7 @@ title: "Roadmap — TILA (Verificado)"
 type: context
 tags: [roadmap, planning, priorities]
 sources: [raw/codebase/snapshots/backend-structure.md]
-last_updated: 2026-05-07
+last_updated: 2026-05-16
 ---
 
 # Roadmap — TILA
@@ -18,21 +18,21 @@ last_updated: 2026-05-07
 > Objetivo: Tornar o que existe robusto e seguro antes de adicionar features.
 
 ### 🔴 Security — Prioridade Máxima
-- [ ] Mover `api.security.token.secret` para variável de ambiente `${JWT_SECRET}`
-- [ ] Mover `spring.datasource.password` para variável de ambiente `${DB_PASSWORD}`
-- [ ] Remover `GEMINI_API_KEY=AIzaSy...` hardcoded (manter apenas `${GEMINI_API_KEY}`)
-- [ ] Substituir `medico.get()` por `medico.orElseThrow(() -> new EntityNotFoundException(...))` em AutenticacaoController
-- [ ] Substituir `findByEmail(subject).get()` por `orElseThrow()` em SecurityFilter
+- [x] Mover `api.security.token.secret` para variável de ambiente `${JWT_SECRET}`
+- [x] Mover `spring.datasource.password` para variável de ambiente `${DB_PASSWORD}`
+- [ ] Remover `GEMINI_API_KEY=AIzaSy...` hardcoded do `TilaRagConfig.java` — ❌ **REGRESSÃO** (estava correto, foi reintroduzido)
+- [x] Substituir `medico.get()` por `medico.orElseThrow()` em AutenticacaoController
+- [x] Substituir `findByEmail(subject).get()` por `orElseThrow()` em SecurityFilter
 - [ ] Restringir `GET /logs` para `hasRole("ADMIN")` no SecurityFilterChain
 
 ### 🟡 Convention Fixes
-- [ ] Renomear `logAuditoriaController` → `LogAuditoriaController`
-- [ ] Renomear `logAuditoriaService` → `LogAuditoriaService`
-- [ ] Renomear pacote `athenticate` → `authenticate`
+- [x] Renomear `logAuditoriaController` → `LogAuditoriaController`
+- [x] Renomear `logAuditoriaService` → `LogAuditoriaService`
+- [x] Renomear pacote `athenticate` → `authenticate`
 - [ ] Corrigir `PacienteResponseDTO` para usar `List<ExameResponseDTO>` ao invés de `List<Exame>`
-- [ ] Substituir `@Autowired` field injection por constructor injection em: SecurityConfigurations, SecurityFilter, AutenticacaoService, PacienteController
+- [x] Substituir `@Autowired` field injection por constructor injection em: SecurityConfigurations, SecurityFilter, AutenticacaoService, PacienteController
 - [ ] Reescrever `GlobalExceptionHandler` para retornar `GenericResult.error()` (não `ErrorDetalhe`)
-- [ ] Corrigir typos: `bucasPorId` → `buscarPorId`, `bucasTodosPacientes` → `buscarTodosPacientes`
+- [x] Corrigir typos: `bucasPorId` → `buscarPorId`, `bucasTodosPacientes` → `buscarTodosPacientes`
 
 ### 🟡 Missing CRUD
 - [ ] Implementar `PUT /paciente/{id}` e `DELETE /paciente/{id}` (LGPD direito de retificação/exclusão)
@@ -79,10 +79,16 @@ last_updated: 2026-05-07
 > Objetivo: Ativar o pipeline de IA que já tem infraestrutura pronta.
 
 ### Agente Radiologista
-- [ ] Criar interface `TilaRadiologistaAgent` com `@AiService` e `@SystemMessage`
-- [ ] Definir system prompt especializado em radiologia
-- [ ] Integrar ContentRetriever (RAG) com o agente
-- [ ] Criar endpoint `POST /api/laudos/generate/{exameId}` que orquestra tudo
+- [x] Criar interface `TilaRadiologistaAgent` com `@AiService` e `@SystemMessage(fromResource)`
+- [x] Definir system prompt especializado em radiologia (Foco inicial exclusivo: Raio-X de Tórax)
+- [ ] ❌ **BUG**: Mover `radiologista-system.txt` de `ai/prompt/` para `resources/prompts/` (classpath)
+- [ ] ❌ **BUG**: Corrigir `@Value("AIzaSy...")` hardcoded em `TilaRagConfig` → `@Value("${GEMINI_API_KEY}")`
+- [ ] ❌ **BUG**: Remover `@V("imagem")` do parâmetro `Image` em `TilaRadiologistaAgent`
+- [x] `ContentRetriever` integrado ao agente via `TilaRagConfig.tilaAgent()`
+- [ ] Criar `ExameRepository` com `findByIdWithDetails()` (JOIN FETCH)
+- [ ] Criar DTOs: `LaudoGeracaoRequestDTO`, `LaudoResponseDTO`, `LaudoRevisaoRequestDTO`
+- [ ] Criar `LaudoService` com: `gerarPreLaudo()`, `revisarLaudo()`, `assinarLaudo()`
+- [ ] Criar `LaudoController` com endpoint `POST /laudo/gerar` e demais endpoints REST
 
 ### Base de Conhecimento
 - [ ] Criar pipeline de ingestão: ConhecimentoMedico → text chunks → embeddings → pgvector

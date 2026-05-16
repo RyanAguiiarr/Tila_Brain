@@ -3,7 +3,7 @@ title: "Project Identity — TILA (Verificado)"
 type: context
 tags: [project, identity, status]
 sources: []
-last_updated: 2026-05-07
+last_updated: 2026-05-16
 ---
 
 # Project Identity — TILA
@@ -20,7 +20,7 @@ last_updated: 2026-05-07
 | **Project Skill** | `c:\Projetos\Tila\tila-project-skill\SKILL.md` |
 
 ## Missão
-Plataforma assistida por IA que automatiza rascunhos de laudos médicos (pré-laudos) a partir de imagens DICOM e notas clínicas, reduzindo tempo de redação e risco de erros por fadiga.
+Plataforma assistida por IA que automatiza rascunhos de laudos médicos (pré-laudos) com foco inicial exclusivo em imagens de Raio-X de Tórax, reduzindo tempo de redação e risco de erros por fadiga.
 
 ## Stack
 - **Backend**: Java 21, Spring Boot 4.0.3, PostgreSQL, LangChain4j 0.36.2
@@ -37,28 +37,30 @@ Plataforma assistida por IA que automatiza rascunhos de laudos médicos (pré-la
 - Logs de auditoria (leitura)
 - Entidades JPA: Usuario, Medico, Paciente, Exame, Laudo, LogAuditoria, ConhecimentoMedico
 - Frontend: 10 páginas, 4 componentes compartilhados
-- Infraestrutura AI: LangChain4j beans (chat, embedding, store, retriever)
+- Infraestrutura AI: LangChain4j beans (chat, embedding, store, retriever) em `TilaRagConfig`
+- Interface `TilaRadiologistaAgent` criada com template `@UserMessage` e `@SystemMessage(fromResource)`
+- System prompt `radiologista-system.txt` escrito — foco exclusivo RX Tórax
+- Security hardening: env vars para JWT_SECRET, DB_PASSWORD; orElseThrow(); constructor injection
 
 ### ⚠️ EM PROGRESSO
-- Entidade Laudo criada mas sem controller/service
+- `TilaRadiologistaAgent`: interface criada, mas 3 bugs impedem o funcionamento (ver roadmap)
+- Entidade Laudo criada, LaudoService/LaudoController com design completo mas não implementados
 - Entidade ConhecimentoMedico criada mas sem CRUD
 - Dashboard com dados mockados
 - Agenda com dados mockados
 
 ### 🔲 PLANEJADO (NÃO INICIADO)
 - Exame CRUD completo
-- Laudo CRUD + geração por IA
-- TilaRadiologistaAgent (interface LangChain4j)
+- Laudo CRUD + geração por IA (design documentado 2026-05-16)
 - Pipeline DICOM → scrub → análise → pré-laudo
 - RLHF feedback loop
 - Criptografia em repouso (LGPD)
 - Deploy (AWS ou equivalente)
 
-### 🐛 BUGS CONHECIDOS
-- `medico.get()` sem verificação — crash se médico não encontrado
-- `findByEmail().get()` no SecurityFilter — crash se usuário deletado
-- `ipOrigem` nunca populado nos logs
-- GlobalExceptionHandler retorna formato diferente de GenericResult
+### 🐛 BUGS CONHECIDOS (3 críticos)
+- `GEMINI_API_KEY` hardcoded em `TilaRagConfig` — regressão introduzida na sessão 2026-05-14
+- `radiologista-system.txt` no lugar errado (em `src/main/java` ao invés de `src/main/resources`)
+- `@V("imagem")` inválido em `TilaRadiologistaAgent` para tipo `Image`
 
 ## Referências
 - [[context/roadmap]] — Plano de evolução

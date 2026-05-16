@@ -2,8 +2,8 @@
 title: "Entity: Laudo"
 type: entity
 tags: [backend, jpa, entity, medical, ai, langchain4j]
-sources: [raw/codebase/snapshots/backend-structure.md]
-last_updated: 2026-05-07
+sources: [raw/codebase/snapshots/backend-structure.md, raw/codebase/changelog/2026-05-16-ai-agent-foundation.md]
+last_updated: 2026-05-16
 ---
 
 # Entity: Laudo
@@ -11,7 +11,7 @@ last_updated: 2026-05-07
 > Arquivo: `Tila_BackEnd/tila/src/main/java/tecnologi/tila/tila/entity/Laudo.java`
 > Tabela: `laudo`
 > ID Type: `Long` (GenerationType.IDENTITY)
-> Status no Sistema: ⚠️ **Implementação Parcial** (Entity e Repository existem, Controller/Service ausentes).
+> Status no Sistema: 🟡 **Implementação Avançada** — Entity, Repository e DTOs planejados existem. LaudoService e LaudoController ainda não foram criados no código (design documentado na sessão 2026-05-16).
 
 ---
 
@@ -262,7 +262,23 @@ public interface LaudoRepository extends JpaRepository<Laudo, Long> {
 ```
 > ⚠️ **Problema de Tipagem**: `long` primitivo é usado nas custom queries ao invés de `Long` (wrapper). O JPA pode dar crash (NullPointerException) se por algum motivo uma query derivar de uma chave `null`.
 
+---
+
+## Orquestração Planejada — LaudoService (2026-05-16)
+
+O `LaudoService` (ainda não implementado) terá 4 responsabilidades:
+
+| Método | Descrição |
+|---|---|
+| `gerarPreLaudo(request, imagemBytes, emailMedico)` | Busca Exame (JOIN FETCH), monta `Image` LangChain4j, chama `TilaRadiologistaAgent`, parseia JSON Gemini, persiste `Laudo` com status `RASCUNHO` |
+| `revisarLaudo(laudoId, request)` | Médico salva `textoFinal`, status → `REVISADO`. Bloqueia se já `ASSINADO`. |
+| `assinarLaudo(laudoId)` | Valida que `textoFinal` não está vazio, status → `ASSINADO`. |
+| `listarPorExame(exameId)` | Consulta simples com `findByExameId()`. |
+
+> Ver design completo em [[raw/codebase/changelog/2026-05-16-ai-agent-foundation.md]]
+
 ## Backlinks
 - [[wiki/concepts/data-model]]
 - [[context/ai-pipeline]]
 - [[wiki/concepts/laudo-patterns]]
+- [[wiki/concepts/api-endpoints]]

@@ -3,7 +3,7 @@ title: "API Endpoints — TILA (Verificado)"
 type: concept
 tags: [api, endpoints, backend, rest, controllers]
 sources: [raw/codebase/snapshots/backend-structure.md]
-last_updated: 2026-05-07
+last_updated: 2026-05-16
 ---
 
 # API Endpoints — TILA (Verificado no Código)
@@ -58,13 +58,15 @@ graph LR
 
     subgraph "❌ Não implementados"
         H["CRUD /api/exames"]
-        I["CRUD /api/laudos"]
+        I["POST /laudo/gerar — planejado 2026-05-16"]
+        I2["GET|PUT /laudo/{id} — planejados"]
         J["CRUD /api/agenda"]
         K["PUT/DELETE /paciente"]
     end
 
     style H fill:#f44336,color:#fff
-    style I fill:#f44336,color:#fff
+    style I fill:#FF9800,color:#fff
+    style I2 fill:#FF9800,color:#fff
     style J fill:#f44336,color:#fff
     style K fill:#f44336,color:#fff
 ```
@@ -602,8 +604,8 @@ graph TD
 | `AgendaComponent` | GET /agenda/appointments | ❌ MOCK — service define interface mas backend não existe |
 | `AgendaComponent` | GET /agenda/waiting-room | ❌ MOCK |
 | `AgendaComponent` | GET /agenda/stats | ❌ MOCK |
-| `LaudoIaComponent` | POST /api/laudos/generate/{exameId} | ❌ MOCK — dados hardcoded |
-| `CentroLaudosComponent` | GET /api/laudos | ❌ MOCK — dados hardcoded |
+| `LaudoIaComponent` | POST /laudo/gerar | ⚠️ PLANEJADO — design documentado 2026-05-16, não implementado |
+| `CentroLaudosComponent` | GET /laudo (listar) | ⚠️ PLANEJADO — design documentado 2026-05-16, não implementado |
 
 ---
 
