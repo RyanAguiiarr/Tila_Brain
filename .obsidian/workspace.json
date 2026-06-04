@@ -11,10 +11,14 @@
             "id": "84e741d07828287a",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "Visualização em gráfico"
+              "type": "markdown",
+              "state": {
+                "file": "wiki/sources/2026-06-03-langchain4j-multimodal.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2026-06-03-langchain4j-multimodal"
             }
           }
         ]
@@ -181,6 +185,18 @@
   },
   "active": "84e741d07828287a",
   "lastOpenFiles": [
+    "skills/skill-ingest.md",
+    "skills/skill-update-tila-skill.md",
+    "wiki/concepts/api-endpoints.md",
+    "wiki/concepts/langchain4j-multimodal-workaround.md",
+    "wiki/sources/2026-06-03-integracao-laudo-ia.md",
+    "raw/codebase/conversations/2026-06-03-integracao-laudo-ia.md",
+    "raw/codebase/conversations/2026-06-03-full-integration-ia.md",
+    "raw/codebase/conversations",
+    "raw/codebase/snapshots/2026-06-03-full-staged-changes-utf8.md",
+    "raw/codebase/snapshots/2026-06-03-full-staged-changes.md",
+    "wiki/concepts/rag-vs-llm-wiki.md",
+    "wiki/sources/2026-06-03-langchain4j-multimodal.md",
     "Clippings/Substituí o Claude Design… e Não Tem Limites (Open Design).md",
     "raw/codebase/changelog/2026-05-16-ai-agent-foundation.md",
     "wiki/concepts/data-model.md",
@@ -196,17 +212,6 @@
     "context/security-lgpd.md",
     "context/roadmap.md",
     "skills/skill-lint.md",
-    "log.md",
-    "CLAUDE.md",
-    "wiki/entities/entity-laudo.md",
-    "wiki/concepts/api-endpoints.md",
-    "wiki/concepts/frontend-architecture.md",
-    "wiki/decisions/ADR-003-security-architecture.md",
-    "wiki/decisions/ADR-002-api-response-pattern.md",
-    "wiki/decisions/ADR-001-jwt-cookie-transport.md",
-    "wiki/entities/entity-conhecimento-medico.md",
-    "wiki/outputs/skill-md-update-2026-05-07.md",
-    "wiki/entities/entity-log-auditoria.md",
-    "wiki/entities/entity-exame.md"
+    "log.md"
   ]
 }

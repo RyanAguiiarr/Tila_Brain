@@ -40,18 +40,9 @@ A chave da API de inteligência artificial (Google Gemini) está chumbada no có
 GEMINI_API_KEY=AIzaSyBkM8J29x9...  # 🔴 VULNERABILIDADE CRÍTICA
 ```
 
-### 4. CWE-476: NULL Pointer Dereference Risk (Auth Controller)
-Ao realizar login, o sistema busca o Médico associado ao Usuário. Se um paciente tentar logar, ou um admin sem médico associado, o sistema chamará `.get()` num Optional vazio, crashando a aplicação com HTTP 500.
-**Arquivo**: `AutenticacaoController.java`
-```java
-var medico = medicoRepository.findByUsuario(usuario);
-// 🔴 CRASH SE MEDICO == EMPTY
-var usuarioPerfil = new UserProfileDTO(
-    medico.get().getNomeCompleto(),
-    medico.get().getCrm(),
-    medico.get().getEspecialidade()
-);
-```
+### 4. CWE-476: NULL Pointer Dereference Risk (Auth Controller) — ✅ CORRIGIDO (2026-06-03)
+Ao realizar login, o sistema buscava o Médico associado ao Usuário sem validar. Se um paciente tentasse logar, o sistema crashava.
+**Status**: Corrigido na sessão 2026-06-03. Adicionada verificação de tipo de `Principal` (String vs Usuario) e uso de `.orElseThrow()`.
 
 ### 5. CWE-476: NULL Pointer Dereference Risk (Security Filter)
 No filtro de segurança que executa em *todas* as requisições autenticadas, o sistema busca o usuário pelo email do JWT. Se o usuário tiver sido apagado do banco após emitir o token, isso causa um crash catastrófico não-tratado.

@@ -1,5 +1,5 @@
 # Tila_Brain Index
-> Last updated: 2026-05-16 | Pages: 25 | Sources: 2 raw snapshots
+> Last updated: 2026-06-03 | Pages: 27 | Sources: 3 raw snapshots
 
 ## Concepts
 | Page | Summary | Tags | Updated |
@@ -15,6 +15,7 @@
 | [[wiki/concepts/dicom]] | Padrão DICOM: tags, scrubbing, gap atual no TILA | medical, dicom | 2026-05-07 |
 | [[wiki/concepts/rag-vs-llm-wiki]] | Comparação RAG vs LLM Wiki (Karpathy) | architecture, rag | 2026-05-07 |
 | [[wiki/concepts/laudo-patterns]] | Padrões estruturais de laudos: seções, linguagem, modalidades | medical, patterns | 2026-05-07 |
+| [[wiki/concepts/langchain4j-multimodal-workaround]] | Padrão workaround p/ envio de texto + imagem sem @AiServices | ai, langchain4j, pattern | 2026-06-03 |
 
 ## Entities
 | Page                                         | Summary                                                           | Tags                  | Updated    |
@@ -37,12 +38,15 @@
 | [[wiki/decisions/ADR-001-jwt-cookie-transport]] | HttpOnly cookie primário, Authorization header fallback | security, jwt | 2026-05-07 |
 | [[wiki/decisions/ADR-002-api-response-pattern]] | GenericResult<T> envelope — 85% conforme, error path inconsistente | api, pattern | 2026-05-07 |
 | [[wiki/decisions/ADR-003-security-architecture]] | 6 decisões tomadas, 8 pendentes (refresh token, encryption, etc.) | security, architecture | 2026-05-07 |
+| [[wiki/decisions/ADR-004-langchain4j-multimodal]] | Uso de ChatModel direto ao invés de AiServices para imagens | ai, architecture | 2026-06-03 |
 
 ## Sources
 | Page | Summary | Tags | Updated |
 |---|---|---|---|
 | [[raw/codebase/snapshots/backend-structure]] | Snapshot completo do backend: deps, packages, config, security gaps | raw, snapshot | 2026-05-07 |
 | [[raw/codebase/changelog/2026-05-16-ai-agent-foundation]] | Changelog: TilaRadiologistaAgent, system prompt RX Tórax, design LaudoService | raw, changelog, ai | 2026-05-16 |
+| [[wiki/sources/2026-06-03-langchain4j-multimodal]] | Snapshot detalhando a resolução do conflito @UserMessage | source, ai | 2026-06-03 |
+| [[wiki/sources/2026-06-03-integracao-laudo-ia]] | Fonte da conversa de desenvolvimento de Laudo IA e fixes críticos | source, ai | 2026-06-03 |
 
 ## Outputs
 | Page | Summary | Tags | Updated |

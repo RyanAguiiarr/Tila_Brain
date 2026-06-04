@@ -56,16 +56,18 @@ graph LR
         G["GET /logs"]
     end
 
+    subgraph "/laudo (autenticado)"
+        I["POST /laudo"]
+    end
+
     subgraph "❌ Não implementados"
         H["CRUD /api/exames"]
-        I["POST /laudo/gerar — planejado 2026-05-16"]
         I2["GET|PUT /laudo/{id} — planejados"]
         J["CRUD /api/agenda"]
         K["PUT/DELETE /paciente"]
     end
 
     style H fill:#f44336,color:#fff
-    style I fill:#FF9800,color:#fff
     style I2 fill:#FF9800,color:#fff
     style J fill:#f44336,color:#fff
     style K fill:#f44336,color:#fff
@@ -478,6 +480,44 @@ Cookie: accessToken=eyJhbGci...
 
 ---
 
+## 2.5 Laudo — LaudoController
+
+**Localização**: `tecnologi.tila.tila.controller.LaudoController.LaudoController`
+**Base Path**: `/laudo`
+**Security**: `hasRole("MEDICO")`
+
+### POST /laudo — Gerar Pré-Laudo via IA
+
+**Request**:
+```http
+POST /laudo HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Cookie: accessToken=eyJhbGci...
+
+{
+  "exameId": 1
+}
+```
+
+**Response (201 Created)**:
+```json
+{
+  "success": true,
+  "message": "Operação realizada com sucesso !",
+  "data": {
+    "id": 1,
+    "exameId": 1,
+    "rascunhoIA": "# PRÉ-LAUDO RADIOLÓGICO...",
+    "notaIA": "Nota do modelo",
+    "confidenceScore": 85,
+    "status": "RASCUNHO"
+  }
+}
+```
+
+---
+
 ## 3. Logs de Auditoria — logAuditoriaController
 
 **Localização**: `tecnologi.tila.tila.controller.logAuditoriaController` (⚠️ camelCase)
@@ -563,7 +603,6 @@ graph TD
 
     subgraph "Esperados pelo Frontend ❌"
         D["Exame CRUD"]
-        E["Laudo CRUD + Generate"]
         F["Agenda/Consulta CRUD"]
         G["Dashboard Stats"]
     end
@@ -573,15 +612,15 @@ graph TD
         I["DELETE /paciente/{id}"]
         J["GET /paciente/{id}/dados (DSAR)"]
         K["PUT /medico/{id}"]
+        E["Laudo CRUD (Visualização/Revisão)"]
     end
 
     D -.->|"ProntuarioComponent precisa"| B
-    E -.->|"LaudoIaComponent precisa"| D
     F -.->|"AgendaComponent precisa"| B
     G -.->|"DashboardComponent precisa"| B
 
     style D fill:#f44336,color:#fff
-    style E fill:#f44336,color:#fff
+    style E fill:#FF9800,color:#fff
     style F fill:#f44336,color:#fff
     style G fill:#f44336,color:#fff
     style H fill:#FF9800,color:#fff
@@ -604,8 +643,8 @@ graph TD
 | `AgendaComponent` | GET /agenda/appointments | ❌ MOCK — service define interface mas backend não existe |
 | `AgendaComponent` | GET /agenda/waiting-room | ❌ MOCK |
 | `AgendaComponent` | GET /agenda/stats | ❌ MOCK |
-| `LaudoIaComponent` | POST /laudo/gerar | ⚠️ PLANEJADO — design documentado 2026-05-16, não implementado |
-| `CentroLaudosComponent` | GET /laudo (listar) | ⚠️ PLANEJADO — design documentado 2026-05-16, não implementado |
+| `LaudoIaComponent` | POST /laudo | ✅ Existe |
+| `CentroLaudosComponent` | GET /laudo (listar) | ⚠️ PLANEJADO — não implementado |
 
 ---
 

@@ -20,7 +20,7 @@ last_updated: 2026-05-16
 ### 🔴 Security — Prioridade Máxima
 - [x] Mover `api.security.token.secret` para variável de ambiente `${JWT_SECRET}`
 - [x] Mover `spring.datasource.password` para variável de ambiente `${DB_PASSWORD}`
-- [ ] Remover `GEMINI_API_KEY=AIzaSy...` hardcoded do `TilaRagConfig.java` — ❌ **REGRESSÃO** (estava correto, foi reintroduzido)
+- [x] Remover `GEMINI_API_KEY=AIzaSy...` hardcoded do `TilaRagConfig.java` — ❌ **REGRESSÃO** (estava correto, foi reintroduzido)
 - [x] Substituir `medico.get()` por `medico.orElseThrow()` em AutenticacaoController
 - [x] Substituir `findByEmail(subject).get()` por `orElseThrow()` em SecurityFilter
 - [ ] Restringir `GET /logs` para `hasRole("ADMIN")` no SecurityFilterChain
@@ -29,7 +29,7 @@ last_updated: 2026-05-16
 - [x] Renomear `logAuditoriaController` → `LogAuditoriaController`
 - [x] Renomear `logAuditoriaService` → `LogAuditoriaService`
 - [x] Renomear pacote `athenticate` → `authenticate`
-- [ ] Corrigir `PacienteResponseDTO` para usar `List<ExameResponseDTO>` ao invés de `List<Exame>`
+- [x] Corrigir `PacienteResponseDTO` para usar `List<ExameResponseDTO>` ao invés de `List<Exame>`
 - [x] Substituir `@Autowired` field injection por constructor injection em: SecurityConfigurations, SecurityFilter, AutenticacaoService, PacienteController
 - [ ] Reescrever `GlobalExceptionHandler` para retornar `GenericResult.error()` (não `ErrorDetalhe`)
 - [x] Corrigir typos: `bucasPorId` → `buscarPorId`, `bucasTodosPacientes` → `buscarTodosPacientes`
@@ -57,8 +57,8 @@ last_updated: 2026-05-16
 - [ ] Conectar com frontend (ProntuarioComponent já espera exames)
 
 ### Laudo Module
-- [ ] Criar `LaudoService` com: criar, listar por exame, listar por médico, revisar, assinar
-- [ ] Criar `LaudoController` com endpoints REST
+- [x] Criar `LaudoService` com: criar, listar por exame, listar por médico, revisar, assinar (Parcial - gerarPreLaudo feito)
+- [x] Criar `LaudoController` com endpoints REST
 - [ ] Criar `LaudoRequestDTO` e `LaudoResponseDTO`
 - [ ] Conectar com LaudoIaComponent e CentroLaudosComponent no frontend
 
@@ -81,14 +81,14 @@ last_updated: 2026-05-16
 ### Agente Radiologista
 - [x] Criar interface `TilaRadiologistaAgent` com `@AiService` e `@SystemMessage(fromResource)`
 - [x] Definir system prompt especializado em radiologia (Foco inicial exclusivo: Raio-X de Tórax)
-- [ ] ❌ **BUG**: Mover `radiologista-system.txt` de `ai/prompt/` para `resources/prompts/` (classpath)
-- [ ] ❌ **BUG**: Corrigir `@Value("AIzaSy...")` hardcoded em `TilaRagConfig` → `@Value("${GEMINI_API_KEY}")`
-- [ ] ❌ **BUG**: Remover `@V("imagem")` do parâmetro `Image` em `TilaRadiologistaAgent`
+- [x] ❌ **BUG**: Mover `radiologista-system.txt` de `ai/prompt/` para `resources/prompts/` (classpath)
+- [x] ❌ **BUG**: Corrigir `@Value("AIzaSy...")` hardcoded em `TilaRagConfig` → `@Value("${GEMINI_API_KEY}")`
+- [x] ❌ **BUG**: Remover `@V("imagem")` do parâmetro `Image` em `TilaRadiologistaAgent`
 - [x] `ContentRetriever` integrado ao agente via `TilaRagConfig.tilaAgent()`
-- [ ] Criar `ExameRepository` com `findByIdWithDetails()` (JOIN FETCH)
-- [ ] Criar DTOs: `LaudoGeracaoRequestDTO`, `LaudoResponseDTO`, `LaudoRevisaoRequestDTO`
-- [ ] Criar `LaudoService` com: `gerarPreLaudo()`, `revisarLaudo()`, `assinarLaudo()`
-- [ ] Criar `LaudoController` com endpoint `POST /laudo/gerar` e demais endpoints REST
+- [x] Criar `ExameRepository` com `findByIdWithDetails()` (JOIN FETCH)
+- [x] Criar DTOs: `LaudoGeracaoRequestDTO`, `LaudoResponseDTO`, `LaudoRevisaoRequestDTO`
+- [x] Criar `LaudoService` com: `gerarPreLaudo()`, `revisarLaudo()`, `assinarLaudo()` (gerarPreLaudo concluído)
+- [x] Criar `LaudoController` com endpoint `POST /laudo` e demais endpoints REST
 
 ### Base de Conhecimento
 - [ ] Criar pipeline de ingestão: ConhecimentoMedico → text chunks → embeddings → pgvector

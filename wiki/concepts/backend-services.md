@@ -37,10 +37,6 @@ graph TD
     end
 
     subgraph "Repository Layer"
-        K[UsuarioRepository]
-        L[MedicoRepository]
-        M[PacienteRepository]
-        N[LogAuditoriaRepository]
         O[LaudoRepository]
         P[ConhecimentoMedicoRepository]
         Q[ExameRepository]
@@ -410,6 +406,48 @@ public class logAuditoriaService {  // ⚠️ deveria ser LogAuditoriaService
 
 ---
 
+## LaudoService — Geração de Pré-Laudos IA
+
+### Código Principal (Resumo)
+
+```java
+@Service
+public class LaudoService {
+    private final LaudoRepository laudoRepository;
+    private final ExameRepository exameRepository;
+    private final ChatModel chatModel;
+    
+    public LaudoService(LaudoRepository laudoRepository,
+                        ExameRepository exameRepository,
+                        ChatModel chatModel,
+                        ObjectMapper objectMapper) {
+        this.laudoRepository = laudoRepository;
+        this.exameRepository = exameRepository;
+        this.chatModel = chatModel;
+    }
+
+    public LaudoResponseDTO gerarPreLaudo(LaudoGeracaoRequestDTO request, Usuario usuarioLogado) {
+        var exame = exameRepository.findByIdWithDetails(request.exameId())
+            .orElseThrow(() -> new EntityNotFoundException("Exame não encontrado"));
+
+        // Montagem do prompt com imagem Base64
+        // Envio via chatModel.chat() 
+        // Parsing da GeminiLaudoResponse
+        // Persistência da entidade Laudo
+        
+        return LaudoResponseDTO.fromEntity(laudo);
+    }
+}
+```
+
+### Análise Detalhada
+- ✅ Usa constructor injection com campos `final`.
+- ✅ Trata erros do `Optional` de `exame` com `.orElseThrow`.
+- ✅ Lida com o workaround multimodal do LangChain4j utilizando `ChatModel` direto ao invés de `@AiService`.
+- ⚠️ Falta refatorar `carregarSystemPrompt` e `carregarImagemExame` para classes utilitárias ou `StorageService` dedicado caso o projeto cresça.
+
+---
+
 ## SecurityFilter — JWT Authentication Filter
 
 ### Código Real Completo
@@ -614,7 +652,7 @@ graph LR
 | `LogAuditoriaRepository` | LogAuditoria | Long | `findByUsuarioIdOrderByDataHoraDesc(UUID): List<LogAuditoria>`, `findByDataHoraBetween(LocalDateTime, LocalDateTime): List<LogAuditoria>` |
 | `LaudoRepository` | Laudo | Long | `findByMedicoAndStatus(long, StatusLaudo): List<Laudo>`, `findByExameId(long): List<Laudo>` |
 | `ConhecimentoMedicoRepository` | ConhecimentoMedico | Long | Nenhuma (apenas CRUD padrão) |
-| `ExameRepository` | Exame | Long | Nenhuma (sem custom queries) |
+| `ExameRepository` | Exame | Long | `findByIdWithDetails(Long): Optional<Exame>` (Usa JOIN FETCH) |
 | `ConsultaRepository` | — | — | ❌ Interface vazia (nem extends JpaRepository) |
 
 ---
