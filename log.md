@@ -84,3 +84,11 @@ Ingestão de código vasculhando o `git status` e `git diff` do backend, utiliza
 - Atualizado [[wiki/concepts/api-endpoints]]: Inserido o endpoint real `POST /laudo` (LaudoController).
 - Atualizado [[wiki/concepts/backend-services]]: Inserido `LaudoService` detalhando sua orquestração e refatorações no construtor e dependências.
 - Fonte e referências cruzadas criadas em [[wiki/sources/2026-06-03-integracao-laudo-ia]] e mapeadas no [[index]].
+
+## [2026-06-05 22:36] ingest | Codebase Conversation (Layout e Infraestrutura)
+Ingestão da conversa de desenvolvimento focada em refatoração de layout e discussões arquiteturais.
+- Padronização de layout utilizando `<app-sidebar>` e `<app-dashboard-header>`.
+- Fix de cor de fonte em botões no CSS global.
+- Criação de conceito [[wiki/concepts/angular-state-management]] detalhando abordagens para passar dados entre Prontuário e Laudo.
+- Criação de conceitos [[wiki/concepts/redis-cache-patterns]] e [[wiki/concepts/minio-object-storage]] explicando o uso do Redis (cache/sessions/rate limit) e MinIO (arquivos e DICOM) no Tila.
+- Fonte e referências cruzadas criadas em [[wiki/sources/layout-state-management]] e mapeadas no [[index]].
