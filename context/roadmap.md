@@ -1,142 +1,53 @@
 ---
-title: "Roadmap — TILA (Verificado)"
+title: "TILA — Roadmap"
 type: context
-tags: [roadmap, planning, priorities]
-sources: [raw/codebase/snapshots/backend-structure.md]
-last_updated: 2026-05-16
+last_updated: 2026-06-09
 ---
 
-# Roadmap — TILA
+# TILA — Roadmap
+> Derived from real gaps found in the 2026-06-09 audit.
 
-> Baseado na auditoria completa do codebase em 2026-05-07.
-> Prioridades derivadas de gaps reais encontrados, não de suposições.
+## Phase 1 — Security hardening (NOW — before any staging deploy)
+- [ ] Move JWT secret to `${JWT_SECRET}` environment variable
+- [ ] Move DB password to `${DB_PASSWORD}` environment variable
+- [ ] Remove hardcoded GEMINI_API_KEY from application.properties
+- [ ] Set cookie `secure(true)` (production profile)
+- [ ] Remove unused `import java.awt.*` from SecurityFilter
+- [ ] Set `ddl-auto=validate` for production profile
+- [ ] Set `show-sql=false` for production profile
+- [ ] Add rate limiting to `/auth/login` and `/auth/registrar`
+- [ ] Protect `/auth/registrar` with CRM verification or ADMIN approval
+- [ ] Create LogAuditoriaResponseDTO — stop returning entity directly
+- [ ] Capture `ipOrigem` (request.getRemoteAddr()) in all audit log entries
 
----
+## Phase 2 — Feature completion (NEXT)
+- [ ] Exame CRUD endpoints (POST, GET, PUT, DELETE)
+- [ ] Laudo review endpoint (PUT /laudo/{id} with LaudoRevisaoRequestDTO)
+- [ ] Laudo get endpoint (GET /laudo/{id})
+- [ ] Logout endpoint (clear accessToken cookie)
+- [ ] Consulta entity implementation (currently empty placeholder)
+- [ ] Frontend: LaudoIaComponent — review/edit/sign workflow
+- [ ] Frontend: CentroLaudosComponent — list and filter laudos
+- [ ] Frontend: AgendaComponent — full implementation
+- [ ] Frontend: Loading states for async operations
+- [ ] Remove "s" dependency from package.json (likely typo)
+- [ ] Add @Transactional(readOnly=true) to all read-only service methods
 
-## Phase 1 — Consolidation (CURRENT)
+## Phase 3 — AI pipeline (FUTURE)
+- [ ] Connect RAG to laudo generation flow (use TilaRadiologistaAgent instead of raw ChatModel)
+- [ ] Build ingestão pipeline for ConhecimentoMedico → embeddings
+- [ ] Implement RLHF: capture diff between rascunhoIA and textoFinal
+- [ ] DICOM pipeline: DCM4CHE integration, tag parsing, metadata scrubbing
+- [ ] Resolve model conflict: gemini-2.5-flash (bean) vs gemini-1.5-flash (properties)
+- [ ] Expand beyond RX de Tórax to other modalities
+- [ ] Add monitoring: latency, cost per call, confidence score metrics
 
-> Objetivo: Tornar o que existe robusto e seguro antes de adicionar features.
-
-### 🔴 Security — Prioridade Máxima
-- [x] Mover `api.security.token.secret` para variável de ambiente `${JWT_SECRET}`
-- [x] Mover `spring.datasource.password` para variável de ambiente `${DB_PASSWORD}`
-- [x] Remover `GEMINI_API_KEY=AIzaSy...` hardcoded do `TilaRagConfig.java` — ❌ **REGRESSÃO** (estava correto, foi reintroduzido)
-- [x] Substituir `medico.get()` por `medico.orElseThrow()` em AutenticacaoController
-- [x] Substituir `findByEmail(subject).get()` por `orElseThrow()` em SecurityFilter
-- [ ] Restringir `GET /logs` para `hasRole("ADMIN")` no SecurityFilterChain
-
-### 🟡 Convention Fixes
-- [x] Renomear `logAuditoriaController` → `LogAuditoriaController`
-- [x] Renomear `logAuditoriaService` → `LogAuditoriaService`
-- [x] Renomear pacote `athenticate` → `authenticate`
-- [x] Corrigir `PacienteResponseDTO` para usar `List<ExameResponseDTO>` ao invés de `List<Exame>`
-- [x] Substituir `@Autowired` field injection por constructor injection em: SecurityConfigurations, SecurityFilter, AutenticacaoService, PacienteController
-- [ ] Reescrever `GlobalExceptionHandler` para retornar `GenericResult.error()` (não `ErrorDetalhe`)
-- [x] Corrigir typos: `bucasPorId` → `buscarPorId`, `bucasTodosPacientes` → `buscarTodosPacientes`
-
-### 🟡 Missing CRUD
-- [ ] Implementar `PUT /paciente/{id}` e `DELETE /paciente/{id}` (LGPD direito de retificação/exclusão)
-- [ ] Implementar paginação server-side com `Pageable` em: `GET /paciente`, `GET /logs`
-- [ ] Popular `ipOrigem` via `HttpServletRequest.getRemoteAddr()` em LogAuditoria
-
-### 🔵 Frontend Quick Wins
-- [ ] Implementar lazy loading em `app.routes.ts` (usar `loadComponent: () => import(...)`)
-- [ ] Criar `environment.ts` e `environment.prod.ts` para API URL
-- [ ] Migrar LoginComponent, CadastroComponent, CadastroPacienteComponent para signals
-
----
-
-## Phase 2 — Core Features
-
-> Objetivo: Implementar os domínios core que faltam.
-
-### Exame Module
-- [ ] Criar `ExameService` com CRUD completo
-- [ ] Criar `ExameController` com endpoints: POST, GET (list + by ID), PUT, PATCH status
-- [ ] Implementar upload de imagem (local storage → `./uploads/exames`)
-- [ ] Conectar com frontend (ProntuarioComponent já espera exames)
-
-### Laudo Module
-- [x] Criar `LaudoService` com: criar, listar por exame, listar por médico, revisar, assinar (Parcial - gerarPreLaudo feito)
-- [x] Criar `LaudoController` com endpoints REST
-- [ ] Criar `LaudoRequestDTO` e `LaudoResponseDTO`
-- [ ] Conectar com LaudoIaComponent e CentroLaudosComponent no frontend
-
-### Consulta/Agenda Module
-- [ ] Definir campos da entidade Consulta (data, hora, tipo, paciente, medico, status)
-- [ ] Popular enums StatusConsulta e TipoConsulta
-- [ ] Criar ConsultaService e ConsultaController
-- [ ] Conectar com AgendaComponent no frontend
-
-### Dashboard
-- [ ] Conectar Dashboard com dados reais (contadores, gráficos)
-- [ ] Implementar endpoints de estatísticas
-
----
-
-## Phase 3 — AI Integration
-
-> Objetivo: Ativar o pipeline de IA que já tem infraestrutura pronta.
-
-### Agente Radiologista
-- [x] Criar interface `TilaRadiologistaAgent` com `@AiService` e `@SystemMessage(fromResource)`
-- [x] Definir system prompt especializado em radiologia (Foco inicial exclusivo: Raio-X de Tórax)
-- [x] ❌ **BUG**: Mover `radiologista-system.txt` de `ai/prompt/` para `resources/prompts/` (classpath)
-- [x] ❌ **BUG**: Corrigir `@Value("AIzaSy...")` hardcoded em `TilaRagConfig` → `@Value("${GEMINI_API_KEY}")`
-- [x] ❌ **BUG**: Remover `@V("imagem")` do parâmetro `Image` em `TilaRadiologistaAgent`
-- [x] `ContentRetriever` integrado ao agente via `TilaRagConfig.tilaAgent()`
-- [x] Criar `ExameRepository` com `findByIdWithDetails()` (JOIN FETCH)
-- [x] Criar DTOs: `LaudoGeracaoRequestDTO`, `LaudoResponseDTO`, `LaudoRevisaoRequestDTO`
-- [x] Criar `LaudoService` com: `gerarPreLaudo()`, `revisarLaudo()`, `assinarLaudo()` (gerarPreLaudo concluído)
-- [x] Criar `LaudoController` com endpoint `POST /laudo` e demais endpoints REST
-
-### Base de Conhecimento
-- [ ] Criar pipeline de ingestão: ConhecimentoMedico → text chunks → embeddings → pgvector
-- [ ] Popular com protocolos radiológicos, terminologia, exemplos de laudos
-- [ ] Criar CRUD para ConhecimentoMedico (admin-only)
-
-### DICOM (se viável no escopo acadêmico)
-- [ ] Implementar leitor DICOM básico (dcm4che ou similar)
-- [ ] Implementar scrubbing de metadados LGPD
-- [ ] Integrar com upload de exames
-
----
-
-## Phase 4 — Production Readiness
-
-> Objetivo: Preparar para uso clínico real (se aplicável).
-
-### LGPD Compliance
-- [ ] Criptografia em repouso para campos LGPD (AES-256 ou Jasypt)
-- [ ] Soft delete para pacientes e laudos
-- [ ] Endpoint DSAR (direito de acesso aos dados pessoais)
-- [ ] Consentimento explícito do paciente
-- [ ] Audit log completo (todas as operações CRUD)
-
-### Infrastructure
-- [ ] Migrar de ddl-auto=update para Flyway
-- [ ] Criar profiles Spring (dev, staging, prod)
-- [ ] Configurar rate limiting (Resilience4j ou similar)
-- [ ] Implementar refresh token
-- [ ] Adicionar Swagger/OpenAPI
-- [ ] Configurar Secure=true no cookie (requer HTTPS)
-
-### Quality
-- [ ] Testes unitários (JUnit + Mockito) para services
-- [ ] Testes de integração para controllers
-- [ ] Testes E2E (Playwright ou Cypress) para fluxos críticos
-- [ ] CI/CD pipeline (GitLab CI está configurado mas vazio)
-
-### Deploy
-- [ ] Dockerize backend + frontend
-- [ ] PostgreSQL + pgvector em container
-- [ ] Deploy em cloud (AWS, GCP, ou Railway/Render para acadêmico)
-
-## Referências
-- [[context/project-identity]]
-- [[context/security-lgpd]]
-- [[context/ai-pipeline]]
-- [[context/coding-conventions]]
-
-## Backlinks
-- [[wiki/overview]]
+## Phase 4 — Production readiness (FUTURE)
+- [ ] LGPD full compliance: CPF encryption at rest, clinical data encryption
+- [ ] Patient consent flow (opt-in for AI-assisted laudos)
+- [ ] Right to erasure endpoint (anonimização)
+- [ ] HTTPS everywhere (production CORS with real domain)
+- [ ] Flyway migrations (replace ddl-auto=update)
+- [ ] Observability: metrics, tracing, structured logging
+- [ ] Backup strategy for PostgreSQL + pgvector
+- [ ] CI/CD pipeline (GitLab CI already scaffolded)

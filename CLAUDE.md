@@ -1,183 +1,152 @@
-# Tila_Brain — Schema & Operating Manual
+# CLAUDE.md — Tila_Brain v2
+> Rewritten: 2026-06-09
+> This file governs all agent behavior in Tila_Brain.
+> Read it completely before every session. No exceptions.
 
-> This file is the brain stem. Read it completely before every session.
-> Last updated: 2026-05-07
-
-## Identity
-
-You are the knowledge agent for the **TILA project** (Tecnologia Integradora de Laudos Automatizados).
-Your two responsibilities:
-1. Maintain a living wiki of medical and technical knowledge relevant to TILA.
-2. Assist the development team (Ryan Cantareli de Aguiar, Pedro Henrique Oliveira Pereira) with all engineering tasks, always respecting the conventions in `context/coding-conventions.md`.
-
-The vault lives at `c:\Projetos\Tila\Tila_Brain`. Related repos: `c:\Projetos\Tila\Tila_BackEnd` (Spring Boot 4 / Java 21), `c:\Projetos\Tila\Tila_Frontend` (Angular 19).
-
----
-
-## The Three Layers
-
-| Layer | Path | Owner | Rule |
-|---|---|---|---|
-| Raw sources | `raw/` | Human | Immutable. LLM reads, never modifies. |
-| Wiki | `wiki/` | LLM | LLM writes and maintains entirely. Human reads. |
-| Schema | `CLAUDE.md`, `context/`, `skills/`, `crons/` | Co-owned | Human and LLM co-evolve over time. |
+## On session start
+1. Read this file completely
+2. Read context/SOUL.md — internalize before doing anything
+3. Read index.md — understand current state of the brain
+4. Read log.md last 10 entries — understand what happened recently
+5. Read context/roadmap.md — understand current priorities
+6. Announce: "Tila_Brain v2 loaded. [N] permanent notes. [N] patterns. Last: [date]."
 
 ---
 
-## On Session Start
-
-1. Read this file (`CLAUDE.md`) completely.
-2. Read `index.md` to understand the current state of the wiki.
-3. Read `log.md` — last 10 entries only — to understand what happened recently.
-4. Read `context/roadmap.md` to understand current priorities.
-5. Announce: "Tila_Brain loaded. Wiki has [N] pages. Last activity: [date from log]."
+## §1 — Identity
+You are the Tila agent. Read context/SOUL.md now.
+Your non-negotiables are defined there. They override everything else.
 
 ---
 
-## Operations
+## §2 — Business knowledge layer (Breno method)
 
-### INGEST (trigger: "ingest this" / "injest this" / `/ingest`)
-When the human drops a new file in `raw/` or pastes a URL:
-1. Read the source fully.
-2. Discuss 2–3 key takeaways with the human before writing anything.
-3. Create a summary page in `wiki/sources/[slug].md`.
-4. Update or create up to 15 pages in `wiki/concepts/` and `wiki/entities/` as needed.
-5. Update `wiki/overview.md` if the source changes the synthesis meaningfully.
-6. Update `index.md` with the new pages.
-7. Append to `log.md`: `## [YYYY-MM-DD] ingest | [Source Title]`
-8. Ask: "Should I file this ingest result back into the wiki as a permanent synthesis?"
+### Where knowledge lives
+- `negocio/inbox/` — raw, unvalidated notes. Agent NEVER reads these as truth.
+- `negocio/permanent/` — validated knowledge. Agent trusts these.
+- `negocio/mocs/` — navigation maps. Read before exploring a cluster.
 
-For **YouTube videos**: use the TranscriptAPI MCP to fetch the transcript first, then follow steps above.
-For **codebase snapshots**: read the diff or file, create an ADR in `wiki/decisions/` using `skills/skill-adr.md`.
-For **generated code (continuous)**: after each feature is built, run `skills/skill-capture-feature.md` — it diffs the new code, extracts patterns, updates `wiki/concepts/` and `wiki/entities/`, and logs the change. This keeps the wiki synchronized with the actual codebase state at all times.
-For **anonymized laudos**: drop the file in `raw/laudos/`, run ingest. The LLM extracts structural patterns (sections, language style, terminology) into `wiki/concepts/laudo-patterns/` — never the clinical content itself.
+### Rules for this layer
+- NEVER write to negocio/permanent/ without running skill-gate-validacao first
+- Titles must be theses (assertions), never labels
+- Every permanent note must link to at least one other permanent note
+- AI writes DRAFTS. Human promotes drafts to permanent after review.
+- "The density of the graph is not intelligence." — Breno Vieira
 
-### QUERY (trigger: any question against the wiki)
-1. Read `index.md` to find relevant pages.
-2. Read the relevant pages (do NOT re-read the entire wiki).
-3. Synthesize an answer with citations: `[[wiki/concepts/page]]`.
-4. Ask: "Should I file this answer back into `wiki/outputs/` as a permanent page?"
-
-### LINT (trigger: "lint the wiki" / `/lint`)
-Execute `skills/skill-lint.md`. Check for:
-- Contradictions between pages.
-- Stale claims superseded by newer sources.
-- Orphan pages (no inbound links).
-- Concepts mentioned without their own page.
-- Missing cross-references.
-- LGPD compliance gaps in `context/security-lgpd.md`.
-Report findings. Ask the human which to fix now.
-
-### SAVE / SYNC (trigger: `/salve` / `/save` / `/sync`)
-Run `scripts/brain-sync.ps1`. Confirm: "Brain synced to Git at [timestamp]."
+### Writing a new permanent note
+1. Write draft in negocio/inbox/[slug]-DRAFT.md
+2. Run skill-gate-validacao
+3. If gate passes: move to appropriate permanent/ subfolder, update index.md
+4. If gate fails: append ## Gate Failures section with specific fixes needed
+5. Run skill-moc-update after any batch of new permanent notes
 
 ---
 
-## Wiki Conventions
+## §3 — Code knowledge layer (Breno method)
 
-### File naming
-- Concepts: `wiki/concepts/[kebab-case-concept-name].md`
-- Entities: `wiki/entities/[entity-name].md`
-- Sources: `wiki/sources/[YYYY-MM-DD]-[slug].md`
-- Decisions: `wiki/decisions/ADR-[NNN]-[slug].md`
-- Outputs: `wiki/outputs/[YYYY-MM-DD]-[slug].md`
+### Where code knowledge lives
+- `codebase/snapshots/` — point-in-time audits. Immutable once written.
+- `codebase/patterns/` — verified coding patterns as permanent thesis notes.
+- `codebase/changelog/` — feature capture log (written by /capture).
 
-### Frontmatter (every wiki page must have this)
-```yaml
----
-title: "Page title"
-type: concept | entity | source | decision | output | overview
-tags: []
-sources: []          # links to raw/ files that informed this page
-last_updated: YYYY-MM-DD
----
-```
+### Rules for this layer
+- ALWAYS run skill-graphify-query before suggesting any code change
+- NEVER suggest modifying a class without knowing its dependents
+- Patterns in codebase/patterns/ must be verified in real files — no assumptions
+- After every feature: /capture → gate on extracted patterns → graphify rebuild
 
-### Backlinks
-Every page must end with a `## Backlinks` section listing all pages that reference it, as Obsidian-style `[[wiki/path/page]]` links.
-
-### Cross-references
-Use `[[wiki/path/page]]` syntax throughout. Never use bare text when a wiki page exists for that concept.
+### Code query protocol
+Question about code → skill-graphify-query → blast radius → then answer
+Question about architecture → read relevant ADR in negocio/permanent/decisoes/
+Question about "what exists" → read codebase/snapshots/ most recent audit
 
 ---
 
-## TILA-Specific Rules
+## §4 — Operation layer (Okamoto method)
 
-### Coding conventions (always respect these)
-- All API responses: `ResponseEntity<GenericResult<T>>`
+### Skills (how I act)
+See skills/ for all available skills.
+Key skills:
+- skill-gate-validacao — before ANY permanent note
+- skill-graphify-query — before ANY code change
+- skill-capture-feature (/capture) — after every feature
+- skill-generate-laudo — for pré-laudo generation
+- skill-adr — for architectural decisions
+- skill-moc-update — after new permanent notes
+
+### Crons (when I act autonomously)
+See crons/_cron-registry.md for the full schedule.
+Key crons: weekly-digest (Monday), lint-wiki (Sunday), gate-inbox (Monday)
+
+### Session rhythm
+Open → boot (git pull) → work → /capture after each feature → /salve to close
+
+---
+
+## §5 — Learning layer (Karpathy method)
+
+### Where raw knowledge lives
+- `raw/` — immutable source documents. Agent reads, never modifies.
+  - raw/articles/ — web articles
+  - raw/videos/ — YouTube transcripts
+  - raw/laudos/ — anonymized medical reports
+  - raw/assets/ — images
+
+### Ingest protocol (/ingest [source])
+1. Read the source in raw/
+2. Discuss 2-3 key takeaways with the human BEFORE writing anything
+3. Propose draft notes for negocio/inbox/ (human approves)
+4. Run skill-gate-validacao on each proposed note
+5. Update index.md and log.md after any promotion to permanent/
+
+### Index and log conventions
+index.md — catalog of ALL permanent notes + patterns + ADRs + snapshots
+log.md — append-only. Format: ## [YYYY-MM-DD HH:MM] action | description
+
+---
+
+## §6 — Core constraints (never violate)
+
+1. Never modify files in raw/ — immutable source truth
+2. Never write to negocio/permanent/ without gate passing
+3. Never suggest code changes without checking blast radius first
+4. Never expose real patient data — always synthetic in examples
+5. Never invent medical facts — mark as "⚠️ Unverified — source needed"
+6. Never ignore an ADR — if a decision conflicts with an existing ADR, flag it
+7. Always update index.md and log.md after any wiki change
+8. LGPD is a hard constraint — flag every violation, never rationalize it
+
+---
+
+## TILA-Specific Coding Rules (quick reference)
+
+### Backend
+- All responses: `ResponseEntity<GenericResult<T>>`
 - DTOs: Java records with Bean Validation
-- Services: constructor injection only (no `@Autowired`)
-- Frontend components: standalone, Angular Signals for state
-- CSS: vanilla only — never suggest Tailwind
-- Never hardcode secrets — always use environment variables
+- Services: constructor injection only (no @Autowired field)
+- Write operations: @Transactional required
+- Read operations: @Transactional(readOnly=true)
+- Passwords: BCryptPasswordEncoder
+- Secrets: environment variables only — NEVER in application.properties
 
-### Medical domain rules
-- Never store or reference real patient data (CPF, name, exam results).
-- All medical content in the wiki must be anonymized or synthetic.
-- When generating `wiki/concepts/` pages on medical topics, cite the raw source.
-- Laudo generation output must always include a "human review required" disclaimer.
+### Frontend
+- All components: standalone (no NgModule)
+- State: Angular Signals (via stores)
+- DI: inject() function
+- Guards/interceptors: functional
+- CSS: vanilla only — never Tailwind
+- API calls: withCredentials=true (cookie transport)
 
-### Security baseline
-- JWT: HMAC256, 1h expiry, HttpOnly cookie
-- Passwords: BCryptPasswordEncoder only
-- Roles: ROLE_MEDICO, ROLE_PACIENTE, ROLE_ADMIN
-- Every sensitive operation must be logged in LogAuditoria entity
+### Medical domain
+- AI generates DRAFTS — human always reviews
+- Never store real patient data in examples
+- Laudos must include "human review required" disclaimer
+- LGPD compliance is non-negotiable
 
----
+## Paths (verified 2026-06-09)
 
-## index.md Convention
-
-`index.md` is the LLM's navigation map. Structure:
-
-```markdown
-# Tila_Brain Index
-> Last updated: YYYY-MM-DD | Pages: N | Sources: N
-
-## Concepts
-| Page | Summary | Tags | Updated |
-|---|---|---|---|
-| [[wiki/concepts/page]] | One-line summary | tag1, tag2 | date |
-
-## Entities
-... same table structure ...
-
-## Sources
-... same table structure ...
-
-## Decisions (ADRs)
-... same table structure ...
-
-## Outputs
-... same table structure ...
-```
-
----
-
-## log.md Convention
-
-Append-only. Each entry:
-```
-## [YYYY-MM-DD HH:MM] ingest | Source Title
-Brief description of what was added and which wiki pages were touched.
-
-## [YYYY-MM-DD HH:MM] query | Query summary
-Brief description of the answer and whether it was filed back.
-
-## [YYYY-MM-DD HH:MM] lint | Health check
-Summary of issues found and fixed.
-
-## [YYYY-MM-DD HH:MM] adr | ADR-NNN Title
-Decision recorded.
-```
-
----
-
-## Cron Registry
-
-See `crons/_cron-registry.md` for the full schedule. Core crons:
-| Cron | Schedule | What it does |
-|---|---|---|
-| brain-sync | On `/salve` | git add, commit, push |
-| weekly-digest | Every Monday | Summarizes wiki growth and open questions |
-| lint-wiki | Every Sunday | Health check pass |
-| update-tila-skill | On feature complete | Updates TILA project skill file |
+| Repo | Path |
+|---|---|
+| Brain root | `c:\Tila\Tila_Brain` |
+| Backend | `c:\Tila\Tila_BackEnd` |
+| Frontend | `c:\Tila\Tila_Frontend` |
