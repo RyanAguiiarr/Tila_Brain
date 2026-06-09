@@ -1,5 +1,5 @@
 # Tila_Brain Index
-> Last updated: 2026-06-05 | Pages: 31 | Sources: 4 raw snapshots
+> Last updated: 2026-06-07 | Pages: 32 | Sources: 5 raw snapshots
 
 ## Concepts
 | Page | Summary | Tags | Updated |
@@ -8,8 +8,8 @@
 | [[wiki/concepts/backend-services]] | Inventário de services e repositories com violações encontradas | services, repositories | 2026-05-07 |
 | [[wiki/concepts/api-endpoints]] | Todos os endpoints verificados no código com security gaps | api, endpoints, rest | 2026-05-07 |
 | [[wiki/concepts/frontend-architecture]] | Inventário completo de componentes, rotas, services, e gaps | frontend, angular | 2026-05-07 |
-| [[wiki/concepts/backend-patterns]] | Padrões reais: GenericResult, DTO records, service, audit log | backend, patterns | 2026-05-07 |
-| [[wiki/concepts/angular-patterns]] | Padrões reais: Signals, standalone, inject(), interceptor, guard | frontend, patterns | 2026-05-07 |
+| [[wiki/concepts/backend-patterns]] | Padrões reais: GenericResult, DTO records, service, audit log | backend, patterns | 2026-06-07 |
+| [[wiki/concepts/angular-patterns]] | Padrões reais: Signals, standalone, inject(), interceptor, guard | frontend, patterns | 2026-06-07 |
 | [[wiki/concepts/jwt-authentication]] | Implementação JWT: HMAC256, HttpOnly cookies, SecurityFilter | security, jwt | 2026-05-07 |
 | [[wiki/concepts/laudo-medico]] | Definição e estrutura de laudos médicos brasileiros | medical, laudo | 2026-05-07 |
 | [[wiki/concepts/dicom]] | Padrão DICOM: tags, scrubbing, gap atual no TILA | medical, dicom | 2026-05-07 |
@@ -44,6 +44,9 @@
 | [[wiki/decisions/ADR-002-api-response-pattern]] | GenericResult<T> envelope — 85% conforme, error path inconsistente | api, pattern | 2026-05-07 |
 | [[wiki/decisions/ADR-003-security-architecture]] | 6 decisões tomadas, 8 pendentes (refresh token, encryption, etc.) | security, architecture | 2026-05-07 |
 | [[wiki/decisions/ADR-004-langchain4j-multimodal]] | Uso de ChatModel direto ao invés de AiServices para imagens | ai, architecture | 2026-06-03 |
+| [[wiki/decisions/ADR-005-redis-cache-strategy]] | Estratégia de caching, rate limit e session store com Redis | redis, cache, security | 2026-06-06 |
+| [[wiki/decisions/ADR-006-minio-object-storage]] | Armazenamento de imagens médicas e laudos com MinIO e Presigned URLs | storage, s3, security | 2026-06-06 |
+| [[wiki/decisions/ADR-007-angular-state-management]] | Padrão híbrido de rotas e cache com Angular Signals | angular, signals, state | 2026-06-06 |
 
 ## Sources
 | Page | Summary | Tags | Updated |
@@ -53,6 +56,7 @@
 | [[wiki/sources/2026-06-03-langchain4j-multimodal]] | Snapshot detalhando a resolução do conflito @UserMessage | source, ai | 2026-06-03 |
 | [[wiki/sources/2026-06-03-integracao-laudo-ia]] | Fonte da conversa de desenvolvimento de Laudo IA e fixes críticos | source, ai | 2026-06-03 |
 | [[wiki/sources/layout-state-management]] | Conversa de padronização de layout e infra (State Management, Redis, MinIO) | source, architecture | 2026-06-05 |
+| [[wiki/sources/2026-06-07-refatoracao-auth-signals]] | Conversa sobre refatoração de DTOs, Repositories e uso de Signals | source, architecture | 2026-06-07 |
 
 ## Outputs
 | Page | Summary | Tags | Updated |

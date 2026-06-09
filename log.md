@@ -92,3 +92,13 @@ Ingestão da conversa de desenvolvimento focada em refatoração de layout e dis
 - Criação de conceito [[wiki/concepts/angular-state-management]] detalhando abordagens para passar dados entre Prontuário e Laudo.
 - Criação de conceitos [[wiki/concepts/redis-cache-patterns]] e [[wiki/concepts/minio-object-storage]] explicando o uso do Redis (cache/sessions/rate limit) e MinIO (arquivos e DICOM) no Tila.
 - Fonte e referências cruzadas criadas em [[wiki/sources/layout-state-management]] e mapeadas no [[index]].
+
+## [2026-06-06 15:30] adr | ADR-005, ADR-006, ADR-007
+Registradas decisões arquiteturais relativas ao Redis (caching, rate limit e session store), MinIO (object storage de exames e laudos) e Angular State Management (Signals + Rota).
+
+## [2026-06-07 01:10] ingest | Codebase Conversation (Refatoração Auth e Signals)
+Ingestão de código vasculhando o trabalho da refatoração da camada de Autenticação e compartilhamento de Estado (Signals) implementado no Frontend e Backend.
+- Adicionado conceito sobre interceptores e stores isoladas (`PacienteStore`) em `angular-patterns.md`.
+- Adicionado conceito de padronização de DTOs e `@Repository` em `backend-patterns.md`.
+- Fonte e referências cruzadas criadas em `wiki/sources/2026-06-07-refatoracao-auth-signals` e mapeadas no `index.md`.
+

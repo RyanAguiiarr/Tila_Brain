@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "wiki/sources/2026-06-03-langchain4j-multimodal.md",
+                "file": "wiki/concepts/backend-services.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2026-06-03-langchain4j-multimodal"
+              "title": "backend-services"
             }
           }
         ]
@@ -185,6 +185,9 @@
   },
   "active": "84e741d07828287a",
   "lastOpenFiles": [
+    "wiki/concepts/backend-patterns.md",
+    "wiki/concepts/backend-infrastructure-cache.md",
+    "wiki/sources/2026-06-03-langchain4j-multimodal.md",
     "skills/skill-ingest.md",
     "skills/skill-update-tila-skill.md",
     "wiki/concepts/api-endpoints.md",
@@ -196,14 +199,12 @@
     "raw/codebase/snapshots/2026-06-03-full-staged-changes-utf8.md",
     "raw/codebase/snapshots/2026-06-03-full-staged-changes.md",
     "wiki/concepts/rag-vs-llm-wiki.md",
-    "wiki/sources/2026-06-03-langchain4j-multimodal.md",
     "Clippings/Substituí o Claude Design… e Não Tem Limites (Open Design).md",
     "raw/codebase/changelog/2026-05-16-ai-agent-foundation.md",
     "wiki/concepts/data-model.md",
     "Clippings",
     "wiki/entities/entity-consulta.md",
     "wiki/concepts/backend-services.md",
-    "wiki/concepts/backend-patterns.md",
     "wiki/entities/angular-frontend.md",
     "wiki/entities/spring-boot-backend.md",
     "index.md",
@@ -211,7 +212,6 @@
     "context/coding-conventions.md",
     "context/security-lgpd.md",
     "context/roadmap.md",
-    "skills/skill-lint.md",
-    "log.md"
+    "skills/skill-lint.md"
   ]
 }

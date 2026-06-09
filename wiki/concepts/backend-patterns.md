@@ -102,6 +102,15 @@ public class Entidade {
 - `IDENTITY` para geração de ID (exceto UUID para Usuario)
 - Sem `@Builder` em nenhuma entity
 
+## DTO Naming Pattern
+Todos os DTOs do sistema devem seguir a nomenclatura padronizada e explícita baseada na direção dos dados. DTOs legados em português ou genéricos (como `DadosAutenticacao` ou `DadosResponseLogin`) foram refatorados:
+- **Requisições (Frontend ➡️ Backend)**: `{Contexto}RequestDTO` (ex: `LoginRequestDTO`, `MedicoRequestDTO`)
+- **Respostas (Backend ➡️ Frontend)**: `{Contexto}ResponseDTO` (ex: `LoginResponseDTO`, `ExameResponseDTO`)
+
+## Spring Repository Pattern
+Todos os repositórios JPA devem obrigatoriamente estender `JpaRepository<T, ID>` e possuir a anotação explícita `@Repository`. Isso garante a injeção apropriada e a tradução de exceções específicas de banco de dados pelo Spring.
+
 ## Backlinks
 - [[context/coding-conventions]]
 - [[wiki/concepts/backend-services]]
+- [[wiki/sources/2026-06-07-refatoracao-auth-signals]]

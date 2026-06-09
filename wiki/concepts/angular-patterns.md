@@ -134,6 +134,49 @@ paginatedItems = computed(() => {
 ```
 Sem frameworks CSS. Sem Tailwind. Sem SCSS.
 
+## Signal-Based State — Domínio Específico (PacienteStore)
+Refletindo o ADR-007, o controle de pacientes ativos entre Prontuário e Laudo IA é feito via store baseada em Signals, evitando recarregamentos desnecessários e duplicidade de requests:
+```typescript
+@Injectable({ providedIn: 'root' })
+export class PacienteStore {
+  private pacienteAtual = signal<Paciente | null>(null);
+
+  getPacienteAtual() {
+    return this.pacienteAtual.asReadonly();
+  }
+
+  setPacienteAtual(paciente: Paciente) {
+    this.pacienteAtual.set(paciente);
+  }
+
+  limparPaciente() {
+    this.pacienteAtual.set(null);
+  }
+}
+```
+
+## Interceptor Pattern — Resiliência de Sessão
+Para revogar sessões globalmente em retornos 401/403:
+```typescript
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
+  const authStore = inject(AuthStore);
+
+  // request cloning...
+
+  return next(modifiedReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401 || error.status === 403) {
+        authStore.logout();
+        router.navigate(['/login']);
+      }
+      return throwError(() => error);
+    })
+  );
+};
+```
+
 ## Backlinks
 - [[context/coding-conventions]]
 - [[wiki/concepts/frontend-architecture]]
+- [[wiki/sources/2026-06-07-refatoracao-auth-signals]]
