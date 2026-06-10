@@ -1,40 +1,40 @@
-# CLAUDE.md — Tila_Brain v2
+# CLAUDE.md â€” Tila_Brain v2
 > Rewritten: 2026-06-09
 > This file governs all agent behavior in Tila_Brain.
 > Read it completely before every session. No exceptions.
 
 ## On session start
 1. Read this file completely
-2. Read context/SOUL.md — internalize before doing anything
-3. Read index.md — understand current state of the brain
-4. Read log.md last 10 entries — understand what happened recently
-5. Read context/roadmap.md — understand current priorities
+2. Read 00-Index/SOUL.md â€” internalize before doing anything
+3. Read index.md â€” understand current state of the brain
+4. Read log.md last 10 entries â€” understand what happened recently
+5. Read 01-Negocio/contexto/roadmap.md â€” understand current priorities
 6. Announce: "Tila_Brain v2 loaded. [N] permanent notes. [N] patterns. Last: [date]."
 
 ---
 
-## §1 — Identity
-You are the Tila agent. Read context/SOUL.md now.
+## Â§1 â€” Identity
+You are the Tila agent. Read 00-Index/SOUL.md now.
 Your non-negotiables are defined there. They override everything else.
 
 ---
 
-## §2 — Business knowledge layer (Breno method)
+## Â§2 â€” Business knowledge layer (Breno method)
 
 ### Where knowledge lives
-- `negocio/inbox/` — raw, unvalidated notes. Agent NEVER reads these as truth.
-- `negocio/permanent/` — validated knowledge. Agent trusts these.
-- `negocio/mocs/` — navigation maps. Read before exploring a cluster.
+- `01-Negocio/inbox/` â€” raw, unvalidated notes. Agent NEVER reads these as truth.
+- `01-Negocio/permanent/` â€” validated knowledge. Agent trusts these.
+- `00-Index/mocs/` â€” navigation maps. Read before exploring a cluster.
 
 ### Rules for this layer
-- NEVER write to negocio/permanent/ without running skill-gate-validacao first
+- NEVER write to 01-Negocio/permanent/ without running skill-gate-validacao first
 - Titles must be theses (assertions), never labels
 - Every permanent note must link to at least one other permanent note
 - AI writes DRAFTS. Human promotes drafts to permanent after review.
-- "The density of the graph is not intelligence." — Breno Vieira
+- "The density of the graph is not intelligence." â€” Breno Vieira
 
 ### Writing a new permanent note
-1. Write draft in negocio/inbox/[slug]-DRAFT.md
+1. Write draft in 01-Negocio/inbox/[slug]-DRAFT.md
 2. Run skill-gate-validacao
 3. If gate passes: move to appropriate permanent/ subfolder, update index.md
 4. If gate fails: append ## Gate Failures section with specific fixes needed
@@ -42,79 +42,114 @@ Your non-negotiables are defined there. They override everything else.
 
 ---
 
-## §3 — Code knowledge layer (Breno method)
+## Â§3 â€” Code knowledge layer (Breno method)
 
 ### Where code knowledge lives
-- `codebase/snapshots/` — point-in-time audits. Immutable once written.
-- `codebase/patterns/` — verified coding patterns as permanent thesis notes.
-- `codebase/changelog/` — feature capture log (written by /capture).
+- `03-Codebase/snapshots/` â€” point-in-time audits. Immutable once written.
+- `03-Codebase/patterns/` â€” verified coding patterns as permanent thesis notes.
+- `03-Codebase/changelog/` â€” feature capture log (written by /capture).
 
 ### Rules for this layer
 - ALWAYS run skill-graphify-query before suggesting any code change
 - NEVER suggest modifying a class without knowing its dependents
-- Patterns in codebase/patterns/ must be verified in real files — no assumptions
-- After every feature: /capture → gate on extracted patterns → graphify rebuild
+- Patterns in 03-Codebase/patterns/ must be verified in real files â€” no assumptions
+- After every feature: /capture â†’ gate on extracted patterns â†’ graphify rebuild
 
 ### Code query protocol
-Question about code → skill-graphify-query → blast radius → then answer
-Question about architecture → read relevant ADR in negocio/permanent/decisoes/
-Question about "what exists" → read codebase/snapshots/ most recent audit
+Question about code â†’ skill-graphify-query â†’ blast radius â†’ then answer
+Question about architecture â†’ read relevant ADR in 02-Arquitetura_ADRs/
+Question about "what exists" â†’ read 03-Codebase/snapshots/ most recent audit
 
 ---
 
 ## §4 — Operation layer (Okamoto method)
 
 ### Skills (how I act)
-See skills/ for all available skills.
-Key skills:
+See 05-Skills_Agentes/ for all available skills.
+
+#### Session Pipeline (Fluxo do Programador)
+The programmer workflow follows a strict pipeline. EVERY coding session MUST follow this flow:
+
+```
+/boot → [programação com recorder ativo] → /arch-review → [codificar] → /close → /organizar → commit
+```
+
+| Phase | Skill | Trigger | What it does |
+|---|---|---|---|
+| 🟢 START | skill-session-boot | `/boot` or session start | Loads SOUL, index, logs, roadmap, pipeline, snapshots, last session, pending items. Creates session file. |
+| 🔵 DURING | skill-session-recorder | automatic | Records EVERYTHING: ideas, features, bugs, decisions, code changes, UI changes. Nothing escapes. |
+| 🔵 DURING | skill-arch-review | before coding any idea | Analyzes idea via arch-thinker + Graphify + ADRs. Produces APPROVE/ADJUST/REJECT verdict. |
+| 🔵 DURING | skill-dev-assistant | while coding | Governance layer: checklists, conventions, anti-patterns, security. |
+| 🔵 DURING | skill-graphify-query | before code changes | Blast radius analysis. MANDATORY before touching code. |
+| 🔴 END | skill-session-close | `/close` or `/salve` | Processes session, runs capture-feature + ingest, verifies links, generates report, commits. |
+| 🔴 END | skill-brain-organizer | before commit | Reorganizes, validates, fixes links, updates index and MOCs. |
+
+#### External Skills (used during coding)
+- `arch-thinker` (Tila_Frontend/.agent/skills/) — Architecture thinking framework
+- `java-spring-modern-reviewer` (.claude/skills/) — Java/Spring Boot code review
+- `angular-modern-reviewer` (.claude/skills/) — Angular code review
+
+#### Knowledge Skills
 - skill-gate-validacao — before ANY permanent note
-- skill-graphify-query — before ANY code change
 - skill-capture-feature (/capture) — after every feature
+- skill-ingest (/ingest) — to ingest new knowledge sources
 - skill-generate-laudo — for pré-laudo generation
 - skill-adr — for architectural decisions
 - skill-moc-update — after new permanent notes
+- skill-query — to answer questions against the wiki
 
 ### Crons (when I act autonomously)
-See crons/_cron-registry.md for the full schedule.
+See 06-Automacoes/crons/_cron-registry.md for the full schedule.
 Key crons: weekly-digest (Monday), lint-wiki (Sunday), gate-inbox (Monday)
 
-### Session rhythm
-Open → boot (git pull) → work → /capture after each feature → /salve to close
+### Session rhythm (MANDATORY)
+```
+1. /boot        → Load brain state, create session file, announce briefing
+2. [work]       → Code, discuss, decide — recorder captures EVERYTHING
+3. /arch-review → Before implementing any non-trivial idea (uses arch-thinker + graphify)
+4. [code]       → Write code following dev-assistant checklists and graphify blast radius
+5. /capture     → After each feature is done
+6. /close       → End session: process, organize, verify, commit, push
+```
+
+> ⚠️ RULE: If a programmer starts coding without /boot, silently execute boot first.
+> ⚠️ RULE: If a programmer tries to close without /close, alert them.
 
 ---
 
-## §5 — Learning layer (Karpathy method)
+## Â§5 â€” Learning layer (Karpathy method)
 
 ### Where raw knowledge lives
-- `raw/` — immutable source documents. Agent reads, never modifies.
-  - raw/articles/ — web articles
-  - raw/videos/ — YouTube transcripts
-  - raw/laudos/ — anonymized medical reports
-  - raw/assets/ — images
+- `07-Raw/` â€” immutable source documents. Agent reads, never modifies.
+  - 07-Raw/articles/ â€” web articles
+  - 07-Raw/videos/ â€” YouTube transcripts
+  - 07-Raw/laudos/ â€” anonymized medical reports
+  - 07-Raw/assets/ â€” images
+  - 07-Raw/sessions/ — programming session logs (created by skill-session-boot)
 
 ### Ingest protocol (/ingest [source])
-1. Read the source in raw/
+1. Read the source in 07-Raw/
 2. Discuss 2-3 key takeaways with the human BEFORE writing anything
-3. Propose draft notes for negocio/inbox/ (human approves)
+3. Propose draft notes for 01-Negocio/inbox/ (human approves)
 4. Run skill-gate-validacao on each proposed note
 5. Update index.md and log.md after any promotion to permanent/
 
 ### Index and log conventions
-index.md — catalog of ALL permanent notes + patterns + ADRs + snapshots
-log.md — append-only. Format: ## [YYYY-MM-DD HH:MM] action | description
+index.md â€” catalog of ALL permanent notes + patterns + ADRs + snapshots
+log.md â€” append-only. Format: ## [YYYY-MM-DD HH:MM] action | description
 
 ---
 
-## §6 — Core constraints (never violate)
+## Â§6 â€” Core constraints (never violate)
 
-1. Never modify files in raw/ — immutable source truth
-2. Never write to negocio/permanent/ without gate passing
+1. Never modify files in 07-Raw/ â€” immutable source truth
+2. Never write to 01-Negocio/permanent/ without gate passing
 3. Never suggest code changes without checking blast radius first
-4. Never expose real patient data — always synthetic in examples
-5. Never invent medical facts — mark as "⚠️ Unverified — source needed"
-6. Never ignore an ADR — if a decision conflicts with an existing ADR, flag it
+4. Never expose real patient data â€” always synthetic in examples
+5. Never invent medical facts â€” mark as "âš ï¸ Unverified â€” source needed"
+6. Never ignore an ADR â€” if a decision conflicts with an existing ADR, flag it
 7. Always update index.md and log.md after any wiki change
-8. LGPD is a hard constraint — flag every violation, never rationalize it
+8. LGPD is a hard constraint â€” flag every violation, never rationalize it
 
 ---
 
@@ -127,18 +162,18 @@ log.md — append-only. Format: ## [YYYY-MM-DD HH:MM] action | description
 - Write operations: @Transactional required
 - Read operations: @Transactional(readOnly=true)
 - Passwords: BCryptPasswordEncoder
-- Secrets: environment variables only — NEVER in application.properties
+- Secrets: environment variables only â€” NEVER in application.properties
 
 ### Frontend
 - All components: standalone (no NgModule)
 - State: Angular Signals (via stores)
 - DI: inject() function
 - Guards/interceptors: functional
-- CSS: vanilla only — never Tailwind
+- CSS: vanilla only â€” never Tailwind
 - API calls: withCredentials=true (cookie transport)
 
 ### Medical domain
-- AI generates DRAFTS — human always reviews
+- AI generates DRAFTS â€” human always reviews
 - Never store real patient data in examples
 - Laudos must include "human review required" disclaimer
 - LGPD compliance is non-negotiable

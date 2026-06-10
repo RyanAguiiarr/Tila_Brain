@@ -42,3 +42,17 @@
 ## [2026-06-09 16:46] index | Phase 10: Rewrote index.md v2 with complete catalog
 
 ## [2026-06-09 16:46] migrate | v1 → v2 migration COMPLETE — 30+ files written from real code analysis
+
+## [2026-06-09 19:15] reorganize | Pastas numeradas (00-Index a 07-Raw) — estrutura Johnny Decimal aplicada
+
+## [2026-06-09 22:07] skill | Session Pipeline criado — 5 novas skills: session-boot, session-recorder, arch-review, session-close, brain-organizer
+
+## [2026-06-09 22:07] update | CLAUDE.md §4 reescrito com Session Pipeline (Fluxo do Programador). index.md atualizado com 18 skills. Arquitetura v2.1.
+
+## [2026-06-09 22:20] skill | GuiaSkillsCerebro.md criado em 00-Index catalogando detalhadamente todas as 18 skills do cérebro. index.md atualizado.
+
+## [2026-06-10 19:27] config | tila-brain.md instalado como User Rule do Antigravity em ~/.gemini/config/rules/. Auto-boot, session pipeline, governança de código e gate de qualidade agora são carregados automaticamente a cada nova sessão.
+
+## [2026-06-10 19:31] guide | GuiaUsoAgenteIDE.md criado em 00-Index. Documenta as 2 formas de uso do cérebro com a IDE (manual e automático), com fluxo visual, tabela comparativa e boas práticas. index.md atualizado.
+
+## [2026-06-10 19:33] session | Primeira sessão do Tila_Brain v2 FECHADA. Arquivo de sessão criado em 07-Raw/sessions/2026-06-09-1630-session.md. 10 eventos, 9 arquivos criados, 8 pendências registradas.

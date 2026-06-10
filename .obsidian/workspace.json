@@ -181,6 +181,8 @@
   },
   "active": "84e741d07828287a",
   "lastOpenFiles": [
+    "07-Raw/sessions/2026-06-10-1935-session.md",
+    "07-Raw/sessions/2026-06-09-1630-session.md",
     "wiki/concepts/backend-services.md",
     "wiki/concepts/backend-patterns.md",
     "wiki/concepts/backend-infrastructure-cache.md",
@@ -206,8 +208,6 @@
     "index.md",
     "skills/_template.md",
     "context/coding-conventions.md",
-    "context/security-lgpd.md",
-    "context/roadmap.md",
-    "skills/skill-lint.md"
+    "context/security-lgpd.md"
   ]
 }
