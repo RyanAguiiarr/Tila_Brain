@@ -62,26 +62,16 @@ ou
 /salve
 ```
 
-O agente vai:
+O agente vai **automaticamente**:
 1. Consolidar todos os eventos registrados na sessão
 2. Rodar `/capture` nas features implementadas
-3. Verificar links e integridade
-4. Gerar relatório da sessão
-5. Sugerir mensagem de commit semântico
+3. Rodar o organizador (links, MOCs, index.md)
+4. Verificar integridade e gerar relatório
+5. **Apresentar um resumo e PERGUNTAR se você deseja commitar**
+6. Após sua confirmação, executar `git add . → git commit → git push` no Tila_Brain
+7. Reportar o resultado: commit hash + status do push
 
-**Passo 4** — Organize o cérebro antes de commitar:
-
-```
-/organizar
-```
-
-O agente vai:
-1. Verificar links quebrados
-2. Promover drafts validados
-3. Atualizar `index.md` e MOCs
-4. Confirmar que tudo está consistente
-
-**Passo 5** — Faça o commit e push no Git.
+> 💡 **Não precisa commitar manualmente!** O `/close` faz tudo e só pede seu "Ok" no final.
 
 ### ⚠️ Atenção no Fluxo Manual
 - Se você esquecer de rodar `/boot`, o agente **não terá contexto** do cérebro e pode gerar respostas sem seguir as convenções do TILA
@@ -152,18 +142,15 @@ O agente **automaticamente** vai:
 /close
 ```
 
+O agente vai **automaticamente**: consolidar a sessão, organizar o cérebro, verificar links, apresentar um resumo para sua aprovação e, após o seu "Ok",
+executar `git add . → git commit → git push` no Tila_Brain.
+
 Se você tentar fechar o chat sem usar `/close`, o agente vai alertar:
 ```
 ⚠️ A sessão não foi fechada. Use /close para registrar o que fizemos.
 ```
 
-**Passo 4** — Organize e commite:
-
-```
-/organizar
-```
-
-Depois faça o commit normalmente.
+> 💡 **`/close` é o único passo final necessário.** Organização e commit são automáticos.
 
 ---
 
@@ -176,7 +163,7 @@ Depois faça o commit normalmente.
 | **Carregamento do cérebro** | Sob demanda (quando pedido) | Automático em toda conversa |
 | **Session Recorder** | Ativo após `/boot` | Ativo desde a primeira mensagem |
 | **Risco de esquecer** | Alto — pode codar sem contexto | Baixo — sempre carregado |
-| **Fechamento** | Precisa digitar `/close` | Precisa digitar `/close` (igual) |
+| **Fechamento + commit** | `/close` (auto commit+push) | `/close` (auto commit+push) |
 | **Quando usar** | Sessões rápidas, testes | Desenvolvimento diário |
 
 ---
@@ -202,11 +189,9 @@ graph TD
         DA["🛡️ Dev Assistant valida convenções"]
     end
 
-    subgraph "🔴 ENCERRAMENTO"
+    subgraph "🔴 ENCERRAMENTO — /close faz tudo"
         CAP["/capture — Registrar features"]
-        CL["/close — Fechar sessão"]
-        ORG["/organizar — Limpar cérebro"]
-        COM["🚀 git commit + push"]
+        CL["/close — Organiza + Commit + Push"]
     end
 
     M1 --> SB
@@ -219,8 +204,6 @@ graph TD
     DA --> W
     W --> CAP
     CAP --> CL
-    CL --> ORG
-    ORG --> COM
 ```
 
 ---

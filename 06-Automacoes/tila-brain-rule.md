@@ -66,8 +66,13 @@ arquivo Markdown com instruções detalhadas que o agente DEVE seguir ao pé da 
 Toda sessão de codificação segue este pipeline:
 
 ```
-/boot → [trabalho com recorder ativo] → /arch-review → [código] → /capture → /close → /organizar → commit
+/boot → [trabalho com recorder ativo] → /arch-review → [código] → /capture → /close (organiza + commit + push)
 ```
+
+> ⚠️ O `/close` é o passo final. Ele consolida a sessão, roda o organizador, apresenta
+> um resumo e PERGUNTA se você deseja commitar. Após a confirmação, faz
+> `git add . → git commit → git push` no Tila_Brain. O programador NÃO precisa commitar
+> manualmente.
 
 **Durante toda a interação**, o agente opera como Session Recorder (`skill-session-recorder.md`):
 - Registra ideias, features discutidas, alterações de código, bugs, decisões e refatorações

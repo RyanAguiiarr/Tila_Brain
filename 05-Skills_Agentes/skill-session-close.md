@@ -214,38 +214,45 @@ graph TD
     | Cross-references adicionados | [N] |
     ```
 
-15. **Preparar e executar Git Commit & Push**:
-    
-    **Passo 15.1 — Review antes do commit**:
+15. **Preparar Git Commit & Push**:
+
+    **Passo 15.1 — Apresentar resumo e pedir confirmação**:
+    Apresente ao usuário um breve resumo do que será commitado e PERGUNTE se ele deseja prosseguir com o commit e push.
+    **PARE AQUI E ESPERE A RESPOSTA DO USUÁRIO**.
+
+    **Passo 15.2 — Após aprovação do usuário, fazer o stage**:
     ```bash
     cd c:\Projetos\Tila\Tila_Brain
-    git status
-    git diff --stat
-    ```
-    Apresentar ao programador a lista de mudanças para revisão.
-
-    **Passo 15.2 — Commit com mensagem semântica**:
-    ```bash
     git add .
+    ```
+
+    **Passo 15.3 — Commit com mensagem semântica**:
+    ```bash
     git commit -m "brain: session [YYYY-MM-DD] — [resumo em 1 linha]
-    
+
     Features: [lista curta]
     Bugs: [lista curta]
     ADRs: [lista curta]
-    
+
     Arquivos: [N] criados, [N] atualizados
     Sessão: [duração] | [N] eventos registrados"
     ```
 
-    **Passo 15.3 — Push**:
+    **Passo 15.4 — Push para o remoto**:
     ```bash
     git push origin main
     ```
 
+    **Passo 15.5 — Reportar resultado ao programador**:
+    ```
+    🔀 Git: commit [hash curto] pushed to origin/main ✅
+    ```
+
     **Se o push falhar** (conflito, rede, etc.):
     - Registrar o erro no log
-    - Alertar o programador
-    - NÃO tentar resolver automaticamente — conflitos de merge em knowledge base requerem atenção humana
+    - Alertar o programador com a mensagem de erro
+    - Manter o commit local (já feito) — o push pode ser refeito manualmente
+    - NÃO tentar resolver conflitos de merge automaticamente — requer atenção humana
 
 ---
 

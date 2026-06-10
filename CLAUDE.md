@@ -71,7 +71,7 @@ See 05-Skills_Agentes/ for all available skills.
 The programmer workflow follows a strict pipeline. EVERY coding session MUST follow this flow:
 
 ```
-/boot → [programação com recorder ativo] → /arch-review → [codificar] → /close → /organizar → commit
+/boot → [programação com recorder ativo] → /arch-review → [codificar] → /capture → /close (organiza + commit + push)
 ```
 
 | Phase | Skill | Trigger | What it does |
@@ -81,8 +81,7 @@ The programmer workflow follows a strict pipeline. EVERY coding session MUST fol
 | 🔵 DURING | skill-arch-review | before coding any idea | Analyzes idea via arch-thinker + Graphify + ADRs. Produces APPROVE/ADJUST/REJECT verdict. |
 | 🔵 DURING | skill-dev-assistant | while coding | Governance layer: checklists, conventions, anti-patterns, security. |
 | 🔵 DURING | skill-graphify-query | before code changes | Blast radius analysis. MANDATORY before touching code. |
-| 🔴 END | skill-session-close | `/close` or `/salve` | Processes session, runs capture-feature + ingest, verifies links, generates report, commits. |
-| 🔴 END | skill-brain-organizer | before commit | Reorganizes, validates, fixes links, updates index and MOCs. |
+| 🔴 END | skill-session-close | `/close` or `/salve` | Processes session, runs organizer, verifies links, generates report, **auto git add + commit + push**. |
 
 #### External Skills (used during coding)
 - `arch-thinker` (Tila_Frontend/.agent/skills/) — Architecture thinking framework
@@ -109,8 +108,12 @@ Key crons: weekly-digest (Monday), lint-wiki (Sunday), gate-inbox (Monday)
 3. /arch-review → Before implementing any non-trivial idea (uses arch-thinker + graphify)
 4. [code]       → Write code following dev-assistant checklists and graphify blast radius
 5. /capture     → After each feature is done
-6. /close       → End session: process, organize, verify, commit, push
+6. /close       → End session: organize brain, verify links, auto commit + push
 ```
+
+> ⚠️ RULE: /close is the FINAL step. It automatically runs brain-organizer,
+> presents a summary, asks for confirmation, and then executes `git add . && git commit && git push` on Tila_Brain.
+> The programmer does NOT need to commit manually.
 
 > ⚠️ RULE: If a programmer starts coding without /boot, silently execute boot first.
 > ⚠️ RULE: If a programmer tries to close without /close, alert them.
