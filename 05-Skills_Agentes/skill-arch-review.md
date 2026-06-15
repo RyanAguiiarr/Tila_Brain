@@ -15,6 +15,11 @@ external_skills:
   - angular-modern-reviewer (c:\Projetos\Tila\.claude\skills\angular-modern-reviewer)
 ---
 
+<!--
+Esta modificação na skill `skill-arch-review` foi feita **apenas para o agente Hermes**.
+Ela remove a verificação de cobertura de testes durante a revisão arquitetural, mantendo todas as demais checagens (ADRs, LGPD, blast radius, etc.).
+A política de revisão da equipe permanece inalterada.
+-->
 # Skill: Arch Review
 
 ## Context

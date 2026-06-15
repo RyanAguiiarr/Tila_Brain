@@ -156,6 +156,20 @@ log.md â€” append-only. Format: ## [YYYY-MM-DD HH:MM] action | description
 
 ---
 
+## §7 — Hermes Autonomy Mode (Agente Autônomo)
+
+Quando o Hermes estiver operando (agente autônomo), as seguintes regras se aplicam, tornando automáticas as rotinas que para o programador são manuais:
+1. **Boot Inicial Automático**: Ao iniciar o trabalho, o Hermes já lê o cérebro (SOUL, index, log, roadmap) para carregar seu contexto inicial.
+2. **Consultas Proativas**: `skill-graphify-query` e `skill-dev-assistant` rodam automaticamente durante o trabalho — o agente não espera ser instruído a usá-las.
+3. **Critério de Registro**: 
+   - **Sempre registrar**: decisões arquiteturais (`skill-adr`) e features completas (`skill-capture-feature`).
+   - **Registrar se relevante**: ideias descartadas com razão, correções de rumo, novos padrões identificados (se for importar no futuro).
+   - **Não registrar**: passos intermediários, tentativas/erros de sintaxe ou ruído inútil.
+4. **Fechamento Automático de Ciclo**: Ao finalizar uma funcionalidade ou correção, o Hermes executa as rotinas de fechamento autonomamente (cria/edita/linka notas, roda `skill-gate-validacao`, atualiza `index.md`, e finaliza com `skill-session-close` e commit/push via `brain-sync.ps1`). 
+O ciclo só termina quando o cérebro está atualizado e sincronizado.
+
+---
+
 ## TILA-Specific Coding Rules (quick reference)
 
 ### Backend
