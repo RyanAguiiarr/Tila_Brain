@@ -6,6 +6,7 @@
 - [SOUL.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/SOUL.md) — Agent identity and non-negotiables
 - [GuiaSkillsCerebro.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/GuiaSkillsCerebro.md) — Guia de todas as skills do cérebro
 - [GuiaUsoAgenteIDE.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/GuiaUsoAgenteIDE.md) — Como usar o cérebro com o agente da IDE (manual e automático)
+- [manual-contexto-graphify.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/manual-contexto-graphify.md) — Guia definitivo do Graphify (omnipresente no ciclo de desenvolvimento)
 - [index.md](file:///c:/Projetos/Tila/Tila_Brain/index.md) — This file
 - [log.md](file:///c:/Projetos/Tila/Tila_Brain/log.md) — Append-only activity log
 
@@ -74,7 +75,7 @@
 
 ### Knowledge & Governance
 - [skill-gate-validacao.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-gate-validacao.md) — 6-question gate for permanent notes
-- [skill-graphify-query.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-graphify-query.md) — Blast radius before code changes
+- [skill-graphify-query.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-graphify-query.md) — **Omnipresent context engine:** diagnoses bugs, creates features, refactors, migrates AND blast radius
 - [skill-dev-assistant.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-dev-assistant.md) — Active coding governance layer
 - [skill-moc-update.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-moc-update.md) — Update MOCs after new notes
 - [skill-capture-feature.md](file:///c:/Projetos/Tila/Tila_Brain/05-Skills_Agentes/skill-capture-feature.md) — After every feature (/capture)

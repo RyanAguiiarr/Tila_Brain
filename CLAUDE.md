@@ -50,15 +50,21 @@ Your non-negotiables are defined there. They override everything else.
 - `03-Codebase/changelog/` â€” feature capture log (written by /capture).
 
 ### Rules for this layer
-- ALWAYS run skill-graphify-query before suggesting any code change
+- ALWAYS run skill-graphify-query before ANY interaction with code (creating, modifying, diagnosing, refactoring, migrating)
+- The Graphify is OMNIPRESENT — it guides feature creation, bug diagnosis, refactoring, migration AND blast radius
 - NEVER suggest modifying a class without knowing its dependents
-- Patterns in 03-Codebase/patterns/ must be verified in real files â€” no assumptions
-- After every feature: /capture â†’ gate on extracted patterns â†’ graphify rebuild
+- Patterns in 03-Codebase/patterns/ must be verified in real files — no assumptions
+- After every feature: /capture → gate on extracted patterns → graphify rebuild (`graphify . --update`)
+- Read 00-Index/manual-contexto-graphify.md for the full Graphify Knowledge Base
 
-### Code query protocol
-Question about code â†’ skill-graphify-query â†’ blast radius â†’ then answer
-Question about architecture â†’ read relevant ADR in 02-Arquitetura_ADRs/
-Question about "what exists" â†’ read 03-Codebase/snapshots/ most recent audit
+### Code query protocol (Graphify-first)
+Any question about code → skill-graphify-query → context from graph → then answer
+New feature or idea → skill-graphify-query (find optimal coupling point) → then propose
+Bug or diagnostic → skill-graphify-query (trace end-to-end flow) → then diagnose
+Refactor or migration → skill-graphify-query (map dependencies) → then plan
+Code change → skill-graphify-query (blast radius) → report → await human confirmation → then implement
+Architecture question → read relevant ADR in 02-Arquitetura_ADRs/
+What exists question → read 03-Codebase/snapshots/ most recent audit
 
 ---
 
@@ -80,7 +86,7 @@ The programmer workflow follows a strict pipeline. EVERY coding session MUST fol
 | 🔵 DURING | skill-session-recorder | automatic | Records EVERYTHING: ideas, features, bugs, decisions, code changes, UI changes. Nothing escapes. |
 | 🔵 DURING | skill-arch-review | before coding any idea | Analyzes idea via arch-thinker + Graphify + ADRs. Produces APPROVE/ADJUST/REJECT verdict. |
 | 🔵 DURING | skill-dev-assistant | while coding | Governance layer: checklists, conventions, anti-patterns, security. |
-| 🔵 DURING | skill-graphify-query | before code changes | Blast radius analysis. MANDATORY before touching code. |
+| 🔵 DURING | skill-graphify-query | before ANY code interaction | **Omnipresent context engine.** Diagnoses bugs, finds optimal coupling for features, maps refactoring/migration paths, AND calculates blast radius. MANDATORY for everything. |
 | 🔴 END | skill-session-close | `/close` or `/salve` | Processes session, runs organizer, verifies links, generates report, **auto git add + commit + push**. |
 
 #### External Skills (used during coding)
@@ -195,10 +201,11 @@ O ciclo só termina quando o cérebro está atualizado e sincronizado.
 - Laudos must include "human review required" disclaimer
 - LGPD compliance is non-negotiable
 
-## Paths (verified 2026-06-09)
+## Paths (verified 2026-06-18)
 
 | Repo | Path |
 |---|---|
 | Brain root | `c:\Tila\Tila_Brain` |
 | Backend | `c:\Tila\Tila_BackEnd` |
 | Frontend | `c:\Tila\Tila_Frontend` |
+| Graphify Manual | `c:\Tila\Tila_Brain\00-Index\manual-contexto-graphify.md` |
