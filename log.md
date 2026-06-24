@@ -23,3 +23,4 @@
 23|23|2026-06-18 22:45:11 | discord-summary | Falha ao enviar resumo: ferramenta send_message indisponível
 24|2026-06-19 01:49:06 UTC | discord-summary | Falha ao enviar resumo: ferramenta send_message indisponível
 2026-06-19 01:54:39 UTC | discord-summary | Resumo da sessão enviado
+2026-06-24 19:27:00 UTC | git-conflict-resolved | Conflito em .obsidian/workspace.json resolvido no Tila_Brain e merge finalizado.

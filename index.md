@@ -1,5 +1,5 @@
 # Tila_Brain — Index
-> v2 architecture. Last updated: 2026-06-09.
+> v2 architecture. Last updated: 2026-06-24.
 
 ## Core files
 - [CLAUDE.md](file:///c:/Projetos/Tila/Tila_Brain/CLAUDE.md) — Agent operating manual (start here)
