@@ -1,7 +1,7 @@
 ---
 name: skill-arch-review
 trigger: "antes de codificar qualquer ideia ou decisão" / "review arch" / "analisar ideia" / "/arch-review"
-description: "Analisa ideias e decisões de implementação ANTES de codificar, usando o Arch-Thinker, Graphify, ADRs existentes, e as skills de review (java-spring-modern-reviewer, angular-modern-reviewer). Produz um veredicto de viabilidade (APPROVE / ADJUST / REJECT) com justificativas técnicas embasadas no estado atual do sistema, garantindo que nenhuma mudança seja feita sem análise prévia de impacto."
+description: "Analisa ideias e decisões de implementação ANTES de codificar, usando o Arch-Thinker, Graphify (omnipresente — diagnóstico, criação, refatoração, migração e blast radius), ADRs existentes, e as skills de review (java-spring-modern-reviewer, angular-modern-reviewer). Produz um veredicto de viabilidade (APPROVE / ADJUST / REJECT) com justificativas técnicas embasadas no estado atual do sistema e no grafo de conhecimento, garantindo que nenhuma mudança seja feita sem análise prévia de impacto."
 version: 1.0
 last_updated: 2026-06-09
 integrates_with:
@@ -15,6 +15,11 @@ external_skills:
   - angular-modern-reviewer (c:\Projetos\Tila\.claude\skills\angular-modern-reviewer)
 ---
 
+<!--
+Esta modificação na skill `skill-arch-review` foi feita **apenas para o agente Hermes**.
+Ela remove a verificação de cobertura de testes durante a revisão arquitetural, mantendo todas as demais checagens (ADRs, LGPD, blast radius, etc.).
+A política de revisão da equipe permanece inalterada.
+-->
 # Skill: Arch Review
 
 ## Context
@@ -135,20 +140,51 @@ graph TD
    - A proposta desvia da rota planejada?
    - Se desvia, é justificável?
 
-### Fase 3: Análise de Impacto no Código
+### Fase 3: Análise de Impacto no Código (Graphify Omnipresente)
 
-7. **Executar `skill-graphify-query`** — Blast radius obrigatório:
-   - Quais classes/componentes dependem do que vai ser alterado?
-   - Quantos arquivos serão afetados indiretamente?
-   - Há testes que cobrem o código afetado?
-   
+7. **Executar `skill-graphify-query`** — Análise obrigatória via Graphify conforme o tipo de proposta:
+
+   **A) Se é uma NOVA FEATURE:**
+   - Consultar o grafo para identificar a comunidade com maior coesão para inserção
+   - Verificar se existem DTOs, Repositories ou Services reutilizáveis
+   - Estimar o novo acoplamento que será adicionado ao sistema
+   ```
+   🏗️ PONTO DE ACOPLAMENTO VIA GRAPHIFY
+   - Feature: [descrição]
+   - Comunidade ideal: Community [N] (coesão: [X])
+   - Classes reutilizáveis: [lista]
+   - Novo acoplamento estimado: [N] conexões
+   ```
+
+   **B) Se é uma ALTERAÇÃO ou REFATORAÇÃO:**
+   - Calcular blast radius: quais classes dependem do alvo?
+   - Identificar se o alvo é um God Node e sugerir desacoplamento se necessário
    ```
    🔍 BLAST RADIUS
    - Alvo: [classe/componente a ser alterado]
    - Dependentes diretos: [N] ([lista])
    - Dependentes indiretos: [N] ([lista])
-   - Cobertura de testes: [alta/média/baixa/nenhuma]
    - Risco de regressão: [alto/médio/baixo]
+   ```
+
+   **C) Se é uma MIGRAÇÃO:**
+   - Mapear todos os componentes no padrão legado vs. já migrados
+   - Traçar ordem de migração por menor dependência
+   ```
+   🔄 MAPA DE MIGRAÇÃO VIA GRAPHIFY
+   - Componentes legados: [N] — [lista]
+   - Ordem sugerida: [lista ordenada por menor dependência]
+   - Dependências circulares: [sim/não]
+   ```
+
+   **D) Se é um DIAGNÓSTICO de bug:**
+   - Rastrear o fluxo de dados ponta a ponta
+   - Identificar o ponto provável da falha
+   ```
+   🔍 DIAGNÓSTICO VIA GRAPHIFY
+   - Fluxo rastreado: [Frontend → Controller → Service → Entity]
+   - Ponto provável da falha: [arquivo:método]
+   - Regras de negócio vigentes: [validações encontradas]
    ```
 
 8. **Aplicar o framework do Arch-Thinker** (da skill externa `arch-thinker`):
