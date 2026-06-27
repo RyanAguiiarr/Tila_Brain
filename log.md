@@ -24,3 +24,4 @@
 24|2026-06-19 01:49:06 UTC | discord-summary | Falha ao enviar resumo: ferramenta send_message indisponível
 2026-06-19 01:54:39 UTC | discord-summary | Resumo da sessão enviado
 2026-06-24 19:27:00 UTC | git-conflict-resolved | Conflito em .obsidian/workspace.json resolvido no Tila_Brain e merge finalizado.
+2026-06-27 21:33:00 UTC | medgemma-int4-engine | Implementada quantização INT4 no MedGemma 1.5 4B para evitar CPU offload na RTX 4060, atualizado ADR-008 e criada wiki motor-hibrido-ia-tila-engine.md no Tila_Brain.
