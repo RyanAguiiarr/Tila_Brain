@@ -13,7 +13,7 @@ changelog:
 
 ## Context
 
-O arquivo `SKILL.md` (localizado em `c:\Projetos\Tila\tila-project-skill\SKILL.md`) é o **cartão de visita técnico** do projeto TILA. Ele deve refletir o estado real do codebase a qualquer momento. Quando um agente externo (ou o próprio time) lê o SKILL.md, ele deve ter uma foto fiel da aplicação.
+O arquivo `SKILL.md` (localizado em `c:\Tila\tila-project-skill\SKILL.md`) é o **cartão de visita técnico** do projeto TILA. Ele deve refletir o estado real do codebase a qualquer momento. Quando um agente externo (ou o próprio time) lê o SKILL.md, ele deve ter uma foto fiel da aplicação.
 
 Esta skill faz uma **auditoria tri-way** comparando três fontes de verdade:
 
@@ -63,7 +63,7 @@ Esta skill é acionada em 3 cenários:
 
 ## Pre-flight Checklist
 
-- [ ] O arquivo SKILL.md existe em `c:\Projetos\Tila\tila-project-skill\SKILL.md`?
+- [ ] O arquivo SKILL.md existe em `c:\Tila\tila-project-skill\SKILL.md`?
   - Se não existir: criar novo usando o Template (ver seção abaixo).
 - [ ] O agente tem acesso de leitura aos repositórios `Tila_BackEnd` e `Tila_Frontend`?
 - [ ] As páginas da wiki estão atualizadas? (Se a última ingestão foi há mais de 1 semana, considerar rodar [[skills/skill-ingest]] primeiro.)
@@ -74,7 +74,7 @@ Esta skill é acionada em 3 cenários:
 
 ### Step 1: Scan do Backend
 
-Ler o estado real do repositório `c:\Projetos\Tila\Tila_BackEnd\tila\`:
+Ler o estado real do repositório `c:\Tila\Tila_BackEnd\tila\`:
 
 #### 1.1 Inventário de Controllers e Endpoints
 
@@ -158,7 +158,7 @@ Ler o estado real do repositório `c:\Projetos\Tila\Tila_BackEnd\tila\`:
 
 ### Step 2: Scan do Frontend
 
-Ler o estado real do repositório `c:\Projetos\Tila\Tila_Frontend\`:
+Ler o estado real do repositório `c:\Tila\Tila_Frontend\`:
 
 #### 2.1 Inventário de Componentes
 

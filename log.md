@@ -25,3 +25,5 @@
 2026-06-19 01:54:39 UTC | discord-summary | Resumo da sessão enviado
 2026-06-24 19:27:00 UTC | git-conflict-resolved | Conflito em .obsidian/workspace.json resolvido no Tila_Brain e merge finalizado.
 2026-06-27 21:33:00 UTC | medgemma-int4-engine | Implementada quantização INT4 no MedGemma 1.5 4B para evitar CPU offload na RTX 4060, atualizado ADR-008 e criada wiki motor-hibrido-ia-tila-engine.md no Tila_Brain.
+2026-07-04 15:24:00 UTC | rag-document-ingestor | Criado ingest_documents.py v2 com Semantic Chunking, índices HNSW e checagem incremental MD5, adicionado suporte a pypdf e amostras curadas da SBPT/MIMIC-CXR.
+2026-07-05 05:00:00 UTC | medgemma-first-pipeline | Refatoração completa do pipeline TILA AI para arquitetura MedGemma-First (TITAN v3.0): MedGemma analisa imagem primeiro (sem viés), TorchXRayVision valida, cross-validation anti-alucinação, token limits por seção. ADR-009 criado.

@@ -12,7 +12,7 @@ The dev assistant skill (`skill-dev-assistant.md`) calls this automatically on c
 
 ## Steps
 1. Perguntar ao humano: "Qual foi a feature? Quais arquivos mudaram?" (ou ler o git diff se disponível).
-2. Ler os arquivos modificados de `c:\Projetos\Tila\Tila_BackEnd` ou `c:\Projetos\Tila\Tila_Frontend`.
+2. Ler os arquivos modificados de `c:\Tila\Tila_BackEnd` ou `c:\Tila\Tila_Frontend`.
 3. Escrever uma entrada de changelog em `raw/codebase/changelog/[YYYY-MM-DD]-[feature-slug].md`:
    - Nome e intenção da feature
    - Arquivos criados ou modificados (com descrição de uma linha para cada)

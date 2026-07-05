@@ -1,7 +1,7 @@
 ## Tila Brain — Regra Operacional do Agente
 
 > Esta regra governa o comportamento do agente de IA (Antigravity) em TODAS as sessões de trabalho
-> no workspace `c:\Projetos\Tila`. Ela garante que o Segundo Cérebro (Tila_Brain) seja o centro
+> no workspace `c:\Tila`. Ela garante que o Segundo Cérebro (Tila_Brain) seja o centro
 > de comando de toda interação — carregado automaticamente, consultado continuamente e atualizado
 > a cada sessão.
 
@@ -9,7 +9,7 @@
 
 ### §1 — Auto Boot (Início de Sessão)
 
-Ao iniciar qualquer conversa no workspace `c:\Projetos\Tila`, o agente DEVE executar o boot
+Ao iniciar qualquer conversa no workspace `c:\Tila`, o agente DEVE executar o boot
 silencioso antes de responder ao programador. O boot consiste em:
 
 1. **Ler `Tila_Brain/CLAUDE.md`** — Manual operacional completo (§1 a §6). Internalizar todas as regras.
@@ -121,14 +121,14 @@ Ao criar ou promover conhecimento no cérebro:
 
 | Recurso | Path |
 |---|---|
-| Brain Root | `c:\Projetos\Tila\Tila_Brain` |
-| CLAUDE.md | `c:\Projetos\Tila\Tila_Brain\CLAUDE.md` |
-| SOUL.md | `c:\Projetos\Tila\Tila_Brain\00-Index\SOUL.md` |
-| Skills | `c:\Projetos\Tila\Tila_Brain\05-Skills_Agentes\` |
-| Guia de Skills | `c:\Projetos\Tila\Tila_Brain\00-Index\GuiaSkillsCerebro.md` |
-| Sessions | `c:\Projetos\Tila\Tila_Brain\07-Raw\sessions\` |
-| Backend | `c:\Projetos\Tila\Tila_BackEnd` |
-| Frontend | `c:\Projetos\Tila\Tila_Frontend` |
+| Brain Root | `c:\Tila\Tila_Brain` |
+| CLAUDE.md | `c:\Tila\Tila_Brain\CLAUDE.md` |
+| SOUL.md | `c:\Tila\Tila_Brain\00-Index\SOUL.md` |
+| Skills | `c:\Tila\Tila_Brain\05-Skills_Agentes\` |
+| Guia de Skills | `c:\Tila\Tila_Brain\00-Index\GuiaSkillsCerebro.md` |
+| Sessions | `c:\Tila\Tila_Brain\07-Raw\sessions\` |
+| Backend | `c:\Tila\Tila_BackEnd` |
+| Frontend | `c:\Tila\Tila_Frontend` |
 
 ---
 

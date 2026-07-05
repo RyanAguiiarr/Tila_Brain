@@ -222,7 +222,7 @@ graph TD
 
     **Passo 15.2 — Após aprovação do usuário, fazer o stage**:
     ```bash
-    cd c:\Projetos\Tila\Tila_Brain
+    cd c:\Tila\Tila_Brain
     git add .
     ```
 

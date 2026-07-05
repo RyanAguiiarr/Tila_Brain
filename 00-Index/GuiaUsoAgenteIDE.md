@@ -8,7 +8,7 @@ Este guia ensina como você (desenvolvedor do TILA) interage com o **Tila_Brain*
 
 Antes de usar qualquer uma das duas formas, verifique que:
 
-- ✅ O workspace `c:\Projetos\Tila` está aberto na IDE Antigravity
+- ✅ O workspace `c:\Tila` está aberto na IDE Antigravity
 - ✅ O diretório `Tila_Brain/` existe com toda a estrutura de pastas numeradas (00-Index a 07-Raw)
 - ✅ Os arquivos-chave existem: `CLAUDE.md`, `index.md`, `log.md`, `00-Index/SOUL.md`
 - ✅ A pasta `05-Skills_Agentes/` contém as 18 skills operacionais
@@ -110,7 +110,7 @@ Oi, vamos trabalhar no backend hoje
 ```
 
 O agente **automaticamente** vai:
-1. Detectar que está no workspace `c:\Projetos\Tila`
+1. Detectar que está no workspace `c:\Tila`
 2. Ler o cérebro inteiro (CLAUDE.md, SOUL.md, index.md, log.md, roadmap)
 3. Verificar se a última sessão foi fechada
 4. Criar o arquivo de sessão em `07-Raw/sessions/`
@@ -233,11 +233,11 @@ graph TD
 
 | Recurso | Localização |
 |---|---|
-| Manual completo do cérebro | [manual-do-cerebro.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/manual-do-cerebro.md) |
-| Guia de todas as skills | [GuiaSkillsCerebro.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/GuiaSkillsCerebro.md) |
-| Identidade do agente (SOUL) | [SOUL.md](file:///c:/Projetos/Tila/Tila_Brain/00-Index/SOUL.md) |
-| Regras operacionais (CLAUDE) | [CLAUDE.md](file:///c:/Projetos/Tila/Tila_Brain/CLAUDE.md) |
-| User Rule do Antigravity | [tila-brain-rule.md](file:///c:/Projetos/Tila/Tila_Brain/06-Automacoes/tila-brain-rule.md) |
-| Índice do cérebro | [index.md](file:///c:/Projetos/Tila/Tila_Brain/index.md) |
-| Log de atividades | [log.md](file:///c:/Projetos/Tila/Tila_Brain/log.md) |
-| Sessões de programação | [07-Raw/sessions/](file:///c:/Projetos/Tila/Tila_Brain/07-Raw/sessions/) |
+| Manual completo do cérebro | [manual-do-cerebro.md](file:///c:/Tila/Tila_Brain/00-Index/manual-do-cerebro.md) |
+| Guia de todas as skills | [GuiaSkillsCerebro.md](file:///c:/Tila/Tila_Brain/00-Index/GuiaSkillsCerebro.md) |
+| Identidade do agente (SOUL) | [SOUL.md](file:///c:/Tila/Tila_Brain/00-Index/SOUL.md) |
+| Regras operacionais (CLAUDE) | [CLAUDE.md](file:///c:/Tila/Tila_Brain/CLAUDE.md) |
+| User Rule do Antigravity | [tila-brain-rule.md](file:///c:/Tila/Tila_Brain/06-Automacoes/tila-brain-rule.md) |
+| Índice do cérebro | [index.md](file:///c:/Tila/Tila_Brain/index.md) |
+| Log de atividades | [log.md](file:///c:/Tila/Tila_Brain/log.md) |
+| Sessões de programação | [07-Raw/sessions/](file:///c:/Tila/Tila_Brain/07-Raw/sessions/) |

@@ -32,6 +32,7 @@
 - [ADR-006](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-006-pgvector-postgresql-embeddings.md) — pgvector para embeddings
 - [ADR-007](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-007-microsservico-python-fastapi-para-pipeline-ia.md) — Microsserviço Python FastAPI isolado para pipeline de IA
 - [ADR-008](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-008-medgemma-substitui-gemini-flash.md) — MedGemma 1.5 4B local substitui Gemini Flash remoto
+- [ADR-009](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-009-medgemma-first-pipeline.md) — Pipeline MedGemma-First (Inversão Arquitetural para Laudos Grounded)
 
 ### Domínio Médico
 - [laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md](file:///c:/Tila/Tila_Brain/01-Negocio/medico/laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md)
@@ -90,7 +91,7 @@
 ---
 
 ## Stats
-- Permanent notes: 11 (8 ADRs + 2 medical + 1 product)
+- Permanent notes: 12 (9 ADRs + 2 medical + 1 product)
 - Patterns: 7
 - Snapshots: 4
 - MOCs: 3

@@ -10,9 +10,9 @@ integrates_with:
   - skill-session-recorder (registra resultado da análise)
   - skill-dev-assistant (aplica checklists de governança)
 external_skills:
-  - arch-thinker (c:\Projetos\Tila\Tila_Frontend\.agent\skills\arch-thinker\SKILL.md)
-  - java-spring-modern-reviewer (c:\Projetos\Tila\.claude\skills\java-spring-modern-reviewer)
-  - angular-modern-reviewer (c:\Projetos\Tila\.claude\skills\angular-modern-reviewer)
+  - arch-thinker (c:\Tila\Tila_Frontend\.agent\skills\arch-thinker\SKILL.md)
+  - java-spring-modern-reviewer (c:\Tila\.claude\skills\java-spring-modern-reviewer)
+  - angular-modern-reviewer (c:\Tila\.claude\skills\angular-modern-reviewer)
 ---
 
 <!--
