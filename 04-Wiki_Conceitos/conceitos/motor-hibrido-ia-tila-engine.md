@@ -1,12 +1,12 @@
-# Motor Híbrido de IA do TILA — TITAN v4.1 (Gemini-Duplo + Hard Filter Determinístico + MedSAM Geométrico)
+# Motor Híbrido de IA do TILA — TITAN v4.3 (Gemini-Duplo + Hard Filter Determinístico + MedSAM Geométrico + Blind Reading Mastery)
 
-Este documento detalha a arquitetura de inteligência artificial de triagem e geração de pré-laudos radiológicos do ecossistema TILA, evoluída para a versão **TITAN v4.1**, projetada para máxima precisão clínica, eliminação total de alucinações por *domain shift* ou ruído quantitativo, e delimitação territorial milimétrica.
+Este documento detalha a arquitetura de inteligência artificial de triagem e geração de pré-laudos radiológicos do ecossistema TILA, evoluída para a versão **TITAN v4.3**, projetada para máxima precisão clínica em triagem cega (sem indicação clínica), eliminação de erros de lateralização espacial (ancoragem na bolha gástrica) e dedução por matriz morfológica.
 
 ---
 
-## 1. Visão Geral da Arquitetura em 7 Camadas (TITAN v4.1)
+## 1. Visão Geral da Arquitetura em 7 Camadas (TITAN v4.3)
 
-O serviço de IA do TILA (`tila-ai-service`) opera sob o paradigma **"Gemini no Início e no Fim" (LLM-as-Judge & Self-Consistency)**, integrando controles determinísticos de qualidade e segmentação por MedSAM em 16-bit:
+O serviço de IA do TILA (`tila-ai-service`) opera sob o paradigma **"Gemini no Início e no Fim" (LLM-as-Judge & Self-Consistency)**, integrando controles determinísticos de qualidade, varredura sistemática ABCDE e segmentação por MedSAM em 16-bit:
 
 ```mermaid
 graph TD
@@ -14,16 +14,16 @@ graph TD
     B -->|Saturação > 0.08 / Foto| C[TXRV Desabilitado - Confia só na Visão]
     B -->|Escala de Cinza / Limpa| D[2. TorchXRayVision 16-bit]
     A --> E[3. Gemini 2.5 Flash - Pass 1]
-    E -->|Descrição Visual + BBox 2D| F[Checklist: Cavitação / Nível Hidroaéreo]
+    E -->|Checklist ABCDE + Bolha Gástrica + BBox| F[Varredura Anatômica & Ancoragem Espacial]
     C --> G[4. Hard Filter Service Determinístico]
     D --> G
     E --> G
-    G -->|Remoção Física de Ruído Não Corroborado| H[Payload Filtrado + Trilha de Auditoria]
+    G -->|Safety Net: Advogado do Diabo em Triagem Cega| H[Payload Filtrado + Trilha de Auditoria]
     E -->|Bounding Box 0-1000| I[5. MedSAM Segmentação Geométrico]
     I -->|Área Real / Teto 45%| H
-    H --> J[6. Busca RAG Enriquecida]
-    J -->|PgVector + Diretrizes| K[7. Gemini 2.5 Pro - Pass 2]
-    K -->|Laudo Estruturado & Reconciliação| L[Resumo Humanizado TITAN M8]
+    H --> J[6. Busca RAG Morfológica]
+    J -->|PgVector + Padrões Clássicos da Literatura| K[7. Gemini 2.5 Pro - Pass 2]
+    K -->|Matriz Morfológica & Reconciliação| L[Resumo Humanizado TITAN M8]
 ```
 
 ---
@@ -56,6 +56,13 @@ O modelo MedSAM (`facebook/sam-vit-base`) é instanciado para gerar máscaras an
 - **Pass 1 (Gemini 2.5 Flash):** Extrator visual rápido e neutro. Possui checklist explícito para detecção obrigatória de **cavitação** e **nível hidroaéreo** (`cavitacao_presente`, `nivel_hidroaereo_presente`), crucial para triagem de Tuberculose e abscessos.
 - **Pass 2 (Gemini 2.5 Pro):** Atua como juiz clínico soberano. Recebe o dossiê pré-filtrado (sem ruído espúrio do TXRV) e redige o laudo final segregando claramente *Achados Principais*, *Achados Secundários* e *Impressão Diagnóstica*.
 
+### 2.6. Blind Reading Mastery & Raciocínio Morfológico (TITAN v4.3)
+Para garantir acurácia excepcional em **Triagem Cega** (exames sem indicação clínica ou histórico), o TITAN v4.3 implementa quatro salvaguardas adicionais (ver [[ADR-016-titan-v4-3-blind-reading-mastery]]):
+- **Varredura Anatômica ABCDE:** O Pass 1 é obrigado a preencher o `ChecklistABCDE` (Vias Aéreas, Ossos/Parede, Coração, Diafragma, Campos Pulmonares) antes de qualquer conclusão, eliminando o viés de normalidade do VLM.
+- **Ancoragem Espacial:** O modelo localiza obrigatoriamente a **Bolha Gástrica** para ancorar o lado **ESQUERDO** do paciente, eliminando erros de lateralização.
+- **Safety Net — Advogado do Diabo:** Em triagem cega, probabilidades elevadas ($\ge 50\%$) do TXRV geram um mandato impositivo que proíbe o silêncio do Pass 2, obrigando-o a examinar meticulosamente a película ou justificar morfologicamente o descarte do alerta.
+- **Matriz Morfológica:** O Pass 2 abandona chutes probabilísticos e estrutura o diagnóstico diferencial por eixos morfológicos (Infeccioso, Neoplásico ou Inflamatório/Vasculite/Alveolar), com injeção automática de Padrões Radiológicos Clássicos da literatura via RAG.
+
 ---
 
 ## 3. Transparência na API, Auditoria e Resumo para Leigos
@@ -72,4 +79,4 @@ No retorno do endpoint `POST /api/v1/laudos/gerar`, o contrato `PreLaudoResponse
 ## 4. Aviso Legal e Conformidade CFM/LGPD
 
 Todo documento gerado carrega obrigatoriamente a advertência legal estabelecida pelo CRM/CFM:
-> *"AVISO LEGAL (CFM / LGPD): Este documento constitui uma sugestão preliminar gerada por Inteligência Artificial (TITAN v4.1 — Gemini 2.5 Pro/Flash + TorchXRayVision + MedSAM) e NÃO possui validade médica legal. A revisão, validação e assinatura por um médico radiologista registrado no Conselho Regional de Medicina (CRM) são estritamente obrigatórias antes de qualquer liberação ao paciente ou conduta clínica."*
+> *"AVISO LEGAL (CFM / LGPD): Este documento constitui uma sugestão preliminar gerada por Inteligência Artificial (TITAN v4.3 — Gemini 2.5 Pro/Flash + TorchXRayVision + MedSAM) e NÃO possui validade médica legal. A revisão, validação e assinatura por um médico radiologista registrado no Conselho Regional de Medicina (CRM) são estritamente obrigatórias antes de qualquer liberação ao paciente ou conduta clínica."*

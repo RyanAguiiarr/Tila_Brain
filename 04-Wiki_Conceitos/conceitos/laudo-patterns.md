@@ -91,7 +91,27 @@ A IA primeiro busca na base de dados: *"Como um radiologista humano escreve um l
 A base RAG (PgVector) retorna um texto de exemplo da categoria `LAUDO_EXEMPLO`.
 O LLM copia aquele estilo perfeitamente para o caso do paciente atual.
 
+---
+
+## Varredura Anatômica ABCDE e Matriz Morfológica (TITAN v4.3)
+
+Para evitar viés de normalidade e lateralização em **Triagem Cega** (exames sem indicação clínica), o TILA impõe dois guardrails estruturais na geração de laudos (ver [[ADR-016-titan-v4-3-blind-reading-mastery]]):
+
+1. **Checklist ABCDE (Pass 1):** O modelo visual é obrigado a estruturar sua varredura em 5 etapas estritas:
+   - **A (Airway):** Vias aéreas e traqueia.
+   - **B (Bones):** Caixa torácica e estruturas ósseas.
+   - **C (Cardiac):** Silhueta cardíaca e mediastino.
+   - **D (Diaphragm):** Cúpulas diafragmáticas e seios costofrênicos (com **Ancoragem Espacial na Bolha Gástrica** para definir o lado ESQUERDO do paciente).
+   - **E (Edges/Fields):** Transparência e vascularização dos campos pulmonares.
+
+2. **Matriz Morfológica (Pass 2):** Na redação da *Análise* e *Impressão*, o LLM é proibido de emitir diagnósticos baseados em puro palpite probabilístico. As hipóteses devem ser organizadas por eixos morfológicos clássicos:
+   - **Padrão Infeccioso (Tuberculose / Fúngica):** Opacidade apical + cavitação + espessamento pleural.
+   - **Padrão Neoplásico (Carcinoma / Metástase):** Massa focal espiculada ou bem delimitada.
+   - **Padrão Inflamatório / Alveolar:** Consolidação lobar ou infiltrado reticulonodular difuso.
+
 ## Backlinks
 - [[wiki/concepts/ai-pipeline]]
 - [[wiki/entities/entity-laudo]]
 - [[wiki/concepts/dicom]]
+- [[04-Wiki_Conceitos/conceitos/motor-hibrido-ia-tila-engine]]
+- [[02-Arquitetura_ADRs/ADR-016-titan-v4-3-blind-reading-mastery]]
