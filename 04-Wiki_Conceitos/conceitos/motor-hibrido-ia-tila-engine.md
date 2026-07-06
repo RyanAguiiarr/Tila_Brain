@@ -1,72 +1,75 @@
-# Motor Híbrido de IA do TILA (TorchXRayVision + MedGemma INT4 + TILA Neural Engine)
+# Motor Híbrido de IA do TILA — TITAN v4.1 (Gemini-Duplo + Hard Filter Determinístico + MedSAM Geométrico)
 
-Este documento detalha a arquitetura de inteligência artificial de triagem e geração de pré-laudos radiológicos do ecossistema TILA, projetada para máxima precisão clínica, conformidade com a LGPD/CFM e eficiência extrema de hardware local.
+Este documento detalha a arquitetura de inteligência artificial de triagem e geração de pré-laudos radiológicos do ecossistema TILA, evoluída para a versão **TITAN v4.1**, projetada para máxima precisão clínica, eliminação total de alucinações por *domain shift* ou ruído quantitativo, e delimitação territorial milimétrica.
 
 ---
 
-## 1. Visão Geral da Arquitetura em 3 Camadas
+## 1. Visão Geral da Arquitetura em 7 Camadas (TITAN v4.1)
 
-O serviço de IA do TILA (`tila-ai-service`) opera de forma autônoma e desacoplada da nuvem através de um pipeline de processamento em três etapas fundamentais:
+O serviço de IA do TILA (`tila-ai-service`) opera sob o paradigma **"Gemini no Início e no Fim" (LLM-as-Judge & Self-Consistency)**, integrando controles determinísticos de qualidade e segmentação por MedSAM em 16-bit:
 
-```
-[ Imagem DICOM / PNG ] + [ Indicação Clínica ]
-              │
-              ▼
-┌──────────────────────────────────────────────────────────────┐
-│ Camada 1: Visão Computacional Quantitativa (TorchXRayVision) │
-│ - Modelo DenseNet121 pré-treinado em 18 patologias torácicas │
-│ - Cálculo de probabilidades (%) e níveis de criticidade      │
-└──────────────────────────────────────────────────────────────┘
-              │
-              ▼
-┌──────────────────────────────────────────────────────────────┐
-│ Camada 2: RAG Clínico (PgVector / Bio_ClinicalBERT)          │
-│ - Busca semântica de diretrizes e protocolos médicos         │
-└──────────────────────────────────────────────────────────────┘
-              │
-              ▼
-┌──────────────────────────────────────────────────────────────┐
-│ Camada 3: Redação e Validação Cruzada (Motor Híbrido Fluido) │
-│ ├── Opção A: MedGemma 1.5 4B (GPU INT4 Live)                 │
-│ └── Opção B: TILA Neural Engine (Fallback Determinístico)    │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    A[Imagem Entrada / DICOM 16-bit] --> B[1. Preflight Image Quality Gate]
+    B -->|Saturação > 0.08 / Foto| C[TXRV Desabilitado - Confia só na Visão]
+    B -->|Escala de Cinza / Limpa| D[2. TorchXRayVision 16-bit]
+    A --> E[3. Gemini 2.5 Flash - Pass 1]
+    E -->|Descrição Visual + BBox 2D| F[Checklist: Cavitação / Nível Hidroaéreo]
+    C --> G[4. Hard Filter Service Determinístico]
+    D --> G
+    E --> G
+    G -->|Remoção Física de Ruído Não Corroborado| H[Payload Filtrado + Trilha de Auditoria]
+    E -->|Bounding Box 0-1000| I[5. MedSAM Segmentação Geométrico]
+    I -->|Área Real / Teto 45%| H
+    H --> J[6. Busca RAG Enriquecida]
+    J -->|PgVector + Diretrizes| K[7. Gemini 2.5 Pro - Pass 2]
+    K -->|Laudo Estruturado & Reconciliação| L[Resumo Humanizado TITAN M8]
 ```
 
 ---
 
-## 2. Detalhes Técnicos das Camadas
+## 2. Detalhes Técnicos das Camadas e Barreiras de Proteção
 
-### 2.1. Triagem Visual (`TorchXRayVision`)
-O módulo `triagem_service.py` utiliza o modelo `densenet121-res224-all` da biblioteca TorchXRayVision. A imagem de entrada é redimensionada para 224x224 pixels e normalizada. O modelo avalia 18 patologias pulmonares (ex: *Opacidade Pulmonar, Derrame Pleural, Infiltração, Massa, Pneumotórax, Cardiomegalia*).
-- **Classificação de Criticidade:**
-  - `ALTO`: Probabilidade >= 70% (ou achados críticos urgentes)
-  - `MODERADO`: Probabilidade entre 55% e 69%
-  - `BAIXO`: Probabilidade < 55%
+### 2.1. Preflight Image Quality Gate (`ImageQualityService`)
+Antes de executar qualquer modelo quantitativo, o sistema inspeciona o histograma de cores da imagem de entrada:
+- **O Problema do Domain Shift:** Imagens submetidas por fotografias de filmes impressos ou monitores apresentam tonalidade azulada/amarelada e baixo alcance dinâmico. O TorchXRayVision foi treinado exclusivamente em matrizes DICOM em escala de cinza puro, gerando probabilidades erráticas e alucinações quando exposto a fotos.
+- **A Solução Determinística:** Calcula-se a saturação média dos canais RGB (`saturacao_media`). Se a saturação for superior a `0.08`, o sistema identifica automaticamente a entrada como fotografia (*out-of-distribution*), desabilita a execução do TorchXRayVision (`adequada_para_txrv = False`) e instrui o pipeline a confiar exclusivamente na leitura visual visual do Gemini Pass 1.
 
-### 2.2. O Problema de VRAM e a Solução INT4 (`MedGemma 1.5 4B`)
-O modelo **MedGemma 1.5 4B** (`google/medgemma-1.5-4b-it`) possui 4 bilhões de parâmetros.
-- **Em 16-bit (`float16` / `bfloat16`):** O modelo consome ~8GB de VRAM. Em placas de vídeo comuns como a **NVIDIA RTX 4060 (8GB)**, o carregamento simultâneo dos modelos de visão e busca causa esgotamento da VRAM, ativando o *CPU Offload* (troca de memória via PCIe), o que congela o sistema operacional.
-- **A Solução INT4 (`bitsandbytes`):** Através da configuração `BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True)`, os pesos são compactados para **~2.5GB de VRAM**. Isso elimina totalmente o engarrafamento de memória, garante fluidez no Windows e latência mínima na geração de tokens.
+### 2.2. Triagem Visual 16-bit e Sanity Check (`TorchXRayVision`)
+O módulo `triagem_service.py` converte diretamente arquivos DICOM de 16-bit para a escala $[-1024, 1024]$ HU, preservando toda a faixa dinâmica sem perdas de compressão para 8-bit.
+- O modelo avalia 18 patologias pulmonares.
+- **Sanity Check:** Verifica desvio padrão e média dos pixels para detectar imagens mal calibradas antes da inferência.
 
-### 2.3. Motor Fluido de Fallback (`TILA Neural Engine`)
-Caso o servidor não possua GPU dedicada ou o carregamento do LLM falhe (ex: falta de token HuggingFace ou ambiente de desenvolvimento ultraleve), o sistema aciona de forma transparente e instantânea (< 1 segundo) o **TILA Neural Engine**.
-O motor monta uma redação clínica altamente estruturada, correlacionando os achados quantitativos da visão com a indicação clínica informada, inserindo notas de diagnóstico diferencial (ex: necessidade de investigar Tuberculose ou Pneumonia diante de infiltrados) e anexando as diretrizes RAG recuperadas.
+### 2.3. Hard Filter Determinístico (`HardFilterService`)
+Nas versões anteriores, a regra *"confie no visual, não na triagem"* era apenas uma sugestão de prompt no Pass 2, o que frequentemente falhava devido à natureza probabilística dos LLMs (ex: assumindo falsamente *Massa Pulmonar 56%* no caso COVID).
+- No TITAN v4.1, a reconciliação é **física e determinística em código Python**.
+- O `HardFilterService` cruza cada achado do TorchXRayVision com a descrição e os achados visuais gerados no Passo 1 pelo Gemini Flash.
+- Achados quantitativos não corroborados pelo texto visual são **fisicamente removidos** do contexto enviado ao Gemini Pro e registrados no array de auditoria `achados_removidos`.
+
+### 2.4. Segmentação Geométrica Real (`MedSAM` via `SegmentationService`)
+O modelo MedSAM (`facebook/sam-vit-base`) é instanciado para gerar máscaras anatômicas precisas a partir das bounding boxes devolvidas pelo Passo 1.
+- **Matemática Geométrica:** A porcentagem da lesão no hemitórax é calculada estritamente com base na área total real em pixels da imagem (`w * h`), eliminando heurísticas de *thumbnails*:
+  $$\text{Porcentagem} = \left( \frac{\text{Área da BBox (px)}}{\text{Área Total da Imagem (px)}} \right) \times 100$$
+- **Teto de Plausibilidade:** Implementado o limiar `PLAUSIBILITY_CEILING = 45.0%`. Lesões focais que excedam 45% do tórax recebem a marcação `medida_plausivel = False` e um alerta explicativo no relatório, evitando delimitações imprecisas.
+
+### 2.5. Padrão LLM-as-Judge (Gemini Pass 1 vs Pass 2)
+- **Pass 1 (Gemini 2.5 Flash):** Extrator visual rápido e neutro. Possui checklist explícito para detecção obrigatória de **cavitação** e **nível hidroaéreo** (`cavitacao_presente`, `nivel_hidroaereo_presente`), crucial para triagem de Tuberculose e abscessos.
+- **Pass 2 (Gemini 2.5 Pro):** Atua como juiz clínico soberano. Recebe o dossiê pré-filtrado (sem ruído espúrio do TXRV) e redige o laudo final segregando claramente *Achados Principais*, *Achados Secundários* e *Impressão Diagnóstica*.
 
 ---
 
-## 3. Transparência na API e Alertas para Pacientes
+## 3. Transparência na API, Auditoria e Resumo para Leigos
 
-No retorno do endpoint `POST /api/v1/laudos/gerar`, o objeto `PreLaudoResponse` entrega dois recursos diferenciais:
+No retorno do endpoint `POST /api/v1/laudos/gerar`, o contrato `PreLaudoResponse` entrega observabilidade completa:
 
-1. **`modelo_ia_utilizado`:** Permite auditoria imediata sobre qual motor processou o exame:
-   - `MedGemma-1.5-4B (GPU INT4 Live) + TorchXRayVision`
-   - `TILA Neural Engine (TorchXRayVision + RAG + Validador Fluido)`
-
-2. **`resumo_para_leigo`:** Tradução humanizada e acessível da linguagem médica complexa para que o paciente ou leigo compreenda a gravidade e a necessidade de seguimento clínico sem pânico desnecessário (ex: explicita quando há indicação de buscar exames para descartar Tuberculose ou pneumonia).
+1. **`qualidade_imagem`**: Informa se a imagem foi aceita pelo Preflight Gate (`adequada_para_txrv`), a saturação média e a justificativa técnica.
+2. **`hard_filter_audit`**: Lista exata de todas as patologias quantitativas que foram removidas por falta de corroboração visual.
+3. **`segmentacao`**: Retorna bounding boxes, área em pixels, área total da imagem e flag de plausibilidade geométrica.
+4. **`resumo_para_leigo`**: Tradução humanizada e empática do laudo técnico (TITAN M8), explicando achados e condutas recomendadas de forma compreensível ao paciente sem gerar pânico.
 
 ---
 
 ## 4. Aviso Legal e Conformidade CFM/LGPD
 
 Todo documento gerado carrega obrigatoriamente a advertência legal estabelecida pelo CRM/CFM:
-> *"AVISO LEGAL (CFM / LGPD): Este documento constitui uma sugestão preliminar gerada por Inteligência Artificial (MedGemma 1.5 + TorchXRayVision) e NÃO possui validade médica legal. A revisão, validação e assinatura por um médico radiologista registrado no Conselho Regional de Medicina (CRM) são estritamente obrigatórias antes de qualquer liberação ao paciente ou conduta clínica."*
+> *"AVISO LEGAL (CFM / LGPD): Este documento constitui uma sugestão preliminar gerada por Inteligência Artificial (TITAN v4.1 — Gemini 2.5 Pro/Flash + TorchXRayVision + MedSAM) e NÃO possui validade médica legal. A revisão, validação e assinatura por um médico radiologista registrado no Conselho Regional de Medicina (CRM) são estritamente obrigatórias antes de qualquer liberação ao paciente ou conduta clínica."*
