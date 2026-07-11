@@ -34,6 +34,7 @@
 - [ADR-008](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-008-medgemma-substitui-gemini-flash.md) — MedGemma 1.5 4B local substitui Gemini Flash remoto
 - [ADR-009](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-009-medgemma-first-pipeline.md) — Pipeline MedGemma-First (Inversão Arquitetural para Laudos Grounded)
 - [ADR-016](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-016-titan-v4-3-blind-reading-mastery.md) — TITAN v4.3 Blind Reading Mastery & Raciocínio Morfológico
+- [ADR-017](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-017-seguranca-anti-circunlocucao-e-triagem-4-agudos.md) — Pipeline Híbrido Anti-Circunlocução e Triagem dos 4 Agudos
 
 ### Domínio Médico
 - [laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md](file:///c:/Tila/Tila_Brain/01-Negocio/medico/laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md)
@@ -42,6 +43,9 @@
 
 ### Produto
 - [tila-resolve-gargalo-de-laudos-manuais.md](file:///c:/Tila/Tila_Brain/01-Negocio/produto/tila-resolve-gargalo-de-laudos-manuais.md)
+
+### Guias e Manuais (`03-Guias_e_Manuais`)
+- [guia-tila-ai-cloud-service.md](file:///c:/Tila/Tila_Brain/03-Guias_e_Manuais/guia-tila-ai-cloud-service.md) — Guia Completo e Manual Operacional do Motor Híbrido IA (`tila-ai-cloud-service`)
 
 ### MOCs (Maps of Content)
 - [moc-seguranca-lgpd.md](file:///c:/Tila/Tila_Brain/00-Index/mocs/moc-seguranca-lgpd.md) — Segurança e LGPD
