@@ -1,6 +1,6 @@
 # ADR-017: Pipeline Híbrido de 7 Estágios com Correlação Estruturada Anti-Circunlocução e Triagem dos 4 Agudos
 
-- **Status:** Aceito e Implementado (Verificado por 60 testes unitários em 2026-07-11)
+- **Status:** Aceito, Implementado e Evoluído (v2.6 — Verificado por 100 testes unitários em 2026-07-12)
 - **Decisores:** Time de Arquitetura IA Tila e Radiologia Clínica
 - **Serviço Alvo:** `tila-ai-cloud-service` (Python 3.11 / FastAPI)
 
@@ -81,19 +81,37 @@ graph TD
 
 ---
 
-## 4. Evidência de Validação e Testes (`pytest`)
+## 4. Evidência de Validação e Testes (`pytest`) — v2.5 (60 Testes)
 
-A arquitetura foi submetida a verificação exaustiva por 60 testes unitários autônomos executados com `pytest -v` em 2026-07-11:
-- `tests/test_api.py`: Contrato HTTP e Códigos 200/403.
-- `tests/test_cloud_llm_client.py`: Gates de faturamento (`TestBillingModeGate`), parse de schema e retry exponencial.
-- `tests/test_guardrails.py`: Deteções de alucinação, contradições ("afirmativo vs indeterminado") e limpeza regex `sanitize_text()`.
-- `tests/test_reconciliation.py`: As 6 ramificações de decisão do algoritmo de reconciliação híbrida CNN + LLM.
-- `tests/test_stage0_ingest.py`: Descaracterização EXIF, log LGPD e validação de base de dados real vs teste.
-- `tests/test_stage1_prep.py`: Letterbox no tensor do TorchXRayVision e redimensionamento no PNG do LLM.
-- `tests/test_stage2_txrv.py`: Cálculo de `confianca_bruta` ($\text{conf} = |s - 0.5| \times 2$) e assignment de Tiers.
-- `tests/test_stage6_integration.py`: Testes de triagem dos "4 Agudos" (`test_edema_triggers_urgente`, `test_nodule_triggers_atencao_not_urgente`) e blindagem de `veredito_leigo`.
+A arquitetura foi inicialmente submetida a verificação exaustiva por 60 testes unitários autônomos executados com `pytest -v` em 2026-07-11, cobrindo contratos HTTP (`test_api.py`), parse de schema/billing (`test_cloud_llm_client.py`), guardrails (`test_guardrails.py`), reconciliação (`test_reconciliation.py`), ingestão (`test_stage0_ingest.py`), prep (`test_stage1_prep.py`), TXRV (`test_stage2_txrv.py`) e integração/triagem (`test_stage6_integration.py`).
 
-**Resultado Final:**
+---
+
+## 5. Adendo v2.6 (2026-07-12) — Blindagem Determinística Total e Estabilização de Temperatura (100 Testes)
+
+Para eliminar definitivamente qualquer variação estocástica, contradição textual ou omissão por parte dos LLMs na elaboração clínica, a arquitetura v2.6 implementou três melhorias estruturais adicionais:
+
+### 5.1. Regime de Temperatura Zero (`temperature = 0.0`)
+A análise estruturada visual (Estágio 3) e a redação radiológica (Estágio 5) não constituem tarefas criativas, mas sim classificações estruturadas estritas. Foram fixados os parâmetros de temperatura nos dois clientes:
+- **Gemini (`cloud_llm_client.py`)**: `types.GenerateContentConfig(..., temperature=0.0)` para `_call_gemini` e `_call_gemini_raw`.
+- **Ollama / MedGemma (`stage5_medgemma.py`)**: `payload["options"] = {"temperature": 0.0}` em todas as chamadas HTTP para o endpoint `/api/generate`.
+
+### 5.2. Expansão de Cobertura do Guardrail (`validate_and_sanitize`)
+A constante de controle em `models/guardrails.py` foi ampliada para:
+```python
+_FREE_TEXT_FIELDS = {"secao_recomendacoes", "resumo_para_leigo"}
+```
+Com essa atualização, a checagem de contradição de incerteza (`check_contradictory_uncertainty`) passou a auditar também as recomendações clínicas, bloqueando qualquer frase afirmativa/descompromissada emitida por LLM sobre achados com status `INDETERMINADO`.
+
+### 5.3. Geração Determinística da `secao_tecnica` e `secao_recomendacoes` (`stage6_integration.py`)
+- **`_gerar_secao_tecnica_deterministica()`**: Constrói a seção técnica exclusivamente a partir dos dados estruturados da nuvem (Estágio 3), exibindo incidência (PA/AP), avaliação qualitativa (ótima/boa/limitada), observações de posicionamento (`rotacao_leve`, `inspiracao_subotima`) e dispositivos médicos sem risco de omissão pelo MedGemma.
+- **`_gerar_secao_recomendacoes_deterministica()`**: Adota arquitetura híbrida de três camadas:
+  1. Base determinística por criticidade (`URGENTE`, `REVISAO_PRIORITARIA` ou `NORMAL`).
+  2. Inclusão dos itens estruturados de correlação clínica do Estágio 3 (`correlacao_clinica`).
+  3. Nota complementar opcional do MedGemma (`secao_recomendacoes`), anexada **apenas se** `possible_hallucination_flag == False` e sem contradição detectada.
+
+### 5.4. Resultado Final da Suíte Completa de 100 Testes
+Com a adição das suítes `TestSecaoTecnicaDeterministica` e `TestSecaoRecomendacoesDeterministica` em `test_stage6_integration.py`, e o novo teste de guardrail em `test_guardrails.py`, o sistema atingiu **100% de cobertura nos 100 testes de unidade e regressão**:
 ```text
-======================== 60 passed, 1 warning in 7.00s ========================
+======================== 100 passed, 1 warning in 6.93s ========================
 ```
