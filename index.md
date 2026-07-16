@@ -1,5 +1,5 @@
 # Tila_Brain — Index
-> v2 architecture. Last updated: 2026-06-27.
+> v2 architecture. Last updated: 2026-07-15.
 
 ## Core files
 - [CLAUDE.md](file:///c:/Tila/Tila_Brain/CLAUDE.md) — Agent operating manual (start here)
@@ -35,6 +35,7 @@
 - [ADR-009](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-009-medgemma-first-pipeline.md) — Pipeline MedGemma-First (Inversão Arquitetural para Laudos Grounded)
 - [ADR-016](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-016-titan-v4-3-blind-reading-mastery.md) — TITAN v4.3 Blind Reading Mastery & Raciocínio Morfológico
 - [ADR-017](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-017-seguranca-anti-circunlocucao-e-triagem-4-agudos.md) — Pipeline Híbrido Anti-Circunlocução e Triagem dos 4 Agudos
+- [ADR-018](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-018-estagio-3-fortalecido-e-zoom-condicional.md) — Estágio 3 Fortalecido (Primed Read), Estágio 3.5 (Zoom Condicional) e Resiliência Multimodal
 
 ### Domínio Médico
 - [laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md](file:///c:/Tila/Tila_Brain/01-Negocio/medico/laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md)
@@ -96,7 +97,7 @@
 ---
 
 ## Stats
-- Permanent notes: 13 (10 ADRs + 2 medical + 1 product)
+- Permanent notes: 14 (11 ADRs + 2 medical + 1 product)
 - Patterns: 7
 - Snapshots: 4
 - MOCs: 3
