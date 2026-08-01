@@ -36,6 +36,7 @@
 - [ADR-016](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-016-titan-v4-3-blind-reading-mastery.md) — TITAN v4.3 Blind Reading Mastery & Raciocínio Morfológico
 - [ADR-017](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-017-seguranca-anti-circunlocucao-e-triagem-4-agudos.md) — Pipeline Híbrido Anti-Circunlocução e Triagem dos 4 Agudos
 - [ADR-018](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-018-estagio-3-fortalecido-e-zoom-condicional.md) — Estágio 3 Fortalecido (Primed Read), Estágio 3.5 (Zoom Condicional) e Resiliência Multimodal
+- [ADR-019](file:///c:/Tila/Tila_Brain/02-Arquitetura_ADRs/ADR-019-camada-visualizacao-explicabilidade-laudos.md) — Camada de Visualização e Explicabilidade (Overlay SVG + Vínculo Bidirecional)
 
 ### Domínio Médico
 - [laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md](file:///c:/Tila/Tila_Brain/01-Negocio/medico/laudo-medico-brasileiro-tem-5-secoes-obrigatorias.md)
@@ -103,3 +104,4 @@
 - MOCs: 3
 - Skills: 18 (5 session pipeline + 13 knowledge/governance)
 - Architecture version: v2.1 (Breno + Okamoto + Karpathy + Session Pipeline)
+- Last session: 2026-08-01 (ADR-019 - Camada de Visualização implementada - Etapas 1-7/8 concluídas)
