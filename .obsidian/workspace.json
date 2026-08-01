@@ -11,14 +11,10 @@
             "id": "84e741d07828287a",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "05-Skills_Agentes/skill-ingest.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "skill-ingest"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Visualização em gráfico"
             }
           }
         ]
@@ -185,6 +181,7 @@
   },
   "active": "84e741d07828287a",
   "lastOpenFiles": [
+    "05-Skills_Agentes/skill-ingest.md",
     "07-Raw/sessions/2026-07-05-0200-session.md",
     "05-Skills_Agentes/skill-dev-assistant.md",
     "07-Raw/sessions/2026-06-19-2032-session.md",
@@ -211,7 +208,6 @@
     "wiki/concepts/rag-vs-llm-wiki.md",
     "Clippings/Substituí o Claude Design… e Não Tem Limites (Open Design).md",
     "raw/codebase/changelog/2026-05-16-ai-agent-foundation.md",
-    "wiki/concepts/data-model.md",
     "Clippings"
   ]
 }
