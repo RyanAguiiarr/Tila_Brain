@@ -1,7 +1,7 @@
 # ADR-019: Camada de Visualização e Explicabilidade para Laudos Médicos
 
-- **Status:** Proposto
-- **Data:** 2026-08-01
+- **Status:** Aceito (Implementado)
+- **Data:** 2026-08-03
 - **Decisores:** Ryan, Agente Claude (Fable)
 - **Contexto:** Fable Method — Plan-first analysis
 
